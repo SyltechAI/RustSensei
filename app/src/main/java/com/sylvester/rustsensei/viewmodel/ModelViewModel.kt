@@ -8,6 +8,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sylvester.rustsensei.data.PreferencesManager
 import com.sylvester.rustsensei.llm.DownloadState
+import com.sylvester.rustsensei.llm.DownloadStateHolder
+import com.sylvester.rustsensei.llm.ModelDownloadService
 import com.sylvester.rustsensei.llm.InferenceConfig
 import com.sylvester.rustsensei.llm.InferenceEngine
 import com.sylvester.rustsensei.llm.ModelForegroundService
@@ -55,6 +57,7 @@ data class ModelUiState(
 class ModelViewModel @Inject constructor(
     private val application: Application,
     private val modelManager: ModelManager,
+    private val downloadState: DownloadStateHolder,
     private val prefsManager: PreferencesManager,
     private val engine: InferenceEngine,
     private val modelLifecycle: ModelLifecycle
@@ -74,6 +77,7 @@ class ModelViewModel @Inject constructor(
         val savedModelId = prefsManager.getSelectedModelId()
         _uiState.value = _uiState.value.copy(selectedModelId = savedModelId)
         checkModelStatus()
+        observeDownloadState()
 
         if (_uiState.value.modelState == ModelState.DOWNLOADED && !engine.isModelLoaded()) {
             loadModel()
@@ -121,50 +125,47 @@ class ModelViewModel @Inject constructor(
 
     fun startDownload() {
         val modelInfo = getSelectedModelInfo()
-        viewModelScope.launch {
-            try {
-                _uiState.value = _uiState.value.copy(
-                    modelState = ModelState.DOWNLOADING,
-                    errorMessage = null
-                )
+        _uiState.value = _uiState.value.copy(
+            modelState = ModelState.DOWNLOADING,
+            errorMessage = null
+        )
+        // The download runs in ModelDownloadService (foreground, wake-lock-free);
+        // progress is surfaced via observeDownloadState().
+        ModelDownloadService.start(application, modelInfo.id)
+    }
 
-                modelManager.downloadModel(modelInfo).collect { state ->
-                    when (state) {
-                        is DownloadState.Idle -> {}
-                        is DownloadState.Downloading -> {
-                            _uiState.value = _uiState.value.copy(
-                                modelState = ModelState.DOWNLOADING,
-                                downloadProgress = state.progress,
-                                downloadedMB = state.downloadedMB,
-                                totalMB = state.totalMB,
-                                downloadSpeedMBps = state.speedMBps,
-                                estimatedSecondsLeft = state.estimatedSecondsLeft
-                            )
-                        }
-                        is DownloadState.Completed -> {
-                            val downloadedIds = _uiState.value.downloadedModelIds + modelInfo.id
-                            _uiState.value = _uiState.value.copy(
-                                modelState = ModelState.DOWNLOADED,
-                                downloadProgress = 1f,
-                                modelSizeMB = modelManager.getModelSizeMB(modelInfo),
-                                downloadedModelIds = downloadedIds
-                            )
-                            modelLifecycle.refreshState()
-                        }
-                        is DownloadState.Error -> {
-                            _uiState.value = _uiState.value.copy(
-                                modelState = ModelState.ERROR,
-                                errorMessage = state.message
-                            )
-                        }
+    /**
+     * Mirrors the service-owned download progress ([DownloadStateHolder]) into
+     * uiState. Because the holder is a process singleton, in-flight progress is
+     * restored after a configuration change or navigating away and back.
+     */
+    private fun observeDownloadState() {
+        viewModelScope.launch {
+            downloadState.state.collect { state ->
+                when (state) {
+                    is DownloadState.Idle -> {}
+                    is DownloadState.Downloading -> {
+                        _uiState.value = _uiState.value.copy(
+                            modelState = ModelState.DOWNLOADING,
+                            downloadProgress = state.progress,
+                            downloadedMB = state.downloadedMB,
+                            totalMB = state.totalMB,
+                            downloadSpeedMBps = state.speedMBps,
+                            estimatedSecondsLeft = state.estimatedSecondsLeft
+                        )
+                    }
+                    is DownloadState.Completed -> {
+                        checkModelStatus()
+                        _uiState.value = _uiState.value.copy(downloadProgress = 1f)
+                        modelLifecycle.refreshState()
+                    }
+                    is DownloadState.Error -> {
+                        _uiState.value = _uiState.value.copy(
+                            modelState = ModelState.ERROR,
+                            errorMessage = state.message
+                        )
                     }
                 }
-            } catch (e: Exception) {
-                Log.e(TAG, "Error in startDownload: ${e.message}", e)
-                _uiState.value = _uiState.value.copy(
-                    modelState = ModelState.ERROR,
-                    errorMessage = "Download failed: ${e.message}"
-                )
             }
         }
     }
