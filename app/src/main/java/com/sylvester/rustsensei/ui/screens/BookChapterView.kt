@@ -40,6 +40,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.sylvester.rustsensei.ui.theme.Alpha
 import com.sylvester.rustsensei.ui.theme.Dimens
+import com.sylvester.rustsensei.ui.components.SpecLabel
 import com.sylvester.rustsensei.ui.theme.Spacing
 import com.sylvester.rustsensei.viewmodel.BookViewModel
 import com.sylvester.rustsensei.ui.theme.AppColors
@@ -66,16 +67,20 @@ internal fun BookChapterView(viewModel: BookViewModel) {
             ) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
             }
-            Text(
-                text = chapter.title,
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
+            Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(end = Dimens.ScreenPadding),
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis
-            )
+                    .padding(end = Dimens.ScreenPadding)
+            ) {
+                SpecLabel("Chapter")
+                Text(
+                    text = chapter.title,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
         }
 
         HorizontalDivider(

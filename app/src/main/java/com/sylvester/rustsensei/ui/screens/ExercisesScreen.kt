@@ -69,6 +69,7 @@ import com.sylvester.rustsensei.ui.theme.DifficultyBeginner
 import com.sylvester.rustsensei.ui.theme.DifficultyIntermediate
 import com.sylvester.rustsensei.ui.theme.Dimens
 import com.sylvester.rustsensei.ui.theme.SecondaryText
+import com.sylvester.rustsensei.ui.components.SpecHeader
 import com.sylvester.rustsensei.ui.theme.Spacing
 import com.sylvester.rustsensei.viewmodel.ExerciseScreenMode
 import com.sylvester.rustsensei.viewmodel.ExerciseViewModel
@@ -230,14 +231,8 @@ private fun CategoriesView(
     ) {
         // -- Heading --
         item {
-            Text(
-                text = "Practice",
-                style = MaterialTheme.typography.headlineMedium,
-                fontFamily = FontFamily.Monospace,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(bottom = Spacing.XS)
-            )
+            SpecHeader(eyebrow = "RustSensei / Practice", title = "Practice")
+            Spacer(modifier = Modifier.height(Spacing.XS))
             Text(
                 text = "$totalExercises exercises from Rustlings",
                 style = MaterialTheme.typography.bodyMedium,
