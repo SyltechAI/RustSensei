@@ -24,10 +24,10 @@ import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Code
-import androidx.compose.material.icons.filled.CompareArrows
+import androidx.compose.material.icons.automirrored.filled.CompareArrows
 import androidx.compose.material.icons.filled.Extension
 import androidx.compose.material.icons.filled.Lightbulb
-import androidx.compose.material.icons.filled.MenuBook
+import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material.icons.filled.Quiz
 import androidx.compose.material.icons.filled.Security
@@ -62,13 +62,13 @@ import org.json.JSONObject
 private fun sectionIcon(id: String): ImageVector = when (id) {
     "cheatsheets" -> Icons.Default.Speed
     "compiler-errors" -> Icons.Default.BugReport
-    "comparisons" -> Icons.Default.CompareArrows
+    "comparisons" -> Icons.AutoMirrored.Filled.CompareArrows
     "challenges" -> Icons.Default.Code
     "crates" -> Icons.Default.Extension
     "async-rust" -> Icons.Default.Speed
     "cli-guide" -> Icons.Default.Terminal
     "design-patterns" -> Icons.Default.Psychology
-    "glossary" -> Icons.Default.MenuBook
+    "glossary" -> Icons.AutoMirrored.Filled.MenuBook
     "testing" -> Icons.Default.Lightbulb
     "unsafe-guide" -> Icons.Default.Security
     "interview-prep" -> Icons.Default.Quiz

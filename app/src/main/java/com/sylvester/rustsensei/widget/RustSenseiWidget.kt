@@ -1,6 +1,7 @@
 package com.sylvester.rustsensei.widget
 
 import android.content.Context
+import android.os.Build
 import androidx.compose.ui.graphics.Color
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
@@ -11,6 +12,7 @@ import androidx.glance.GlanceTheme
 import androidx.glance.action.clickable
 import androidx.glance.action.actionStartActivity
 import androidx.glance.appwidget.GlanceAppWidget
+import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
@@ -32,6 +34,9 @@ import com.sylvester.rustsensei.MainActivity
 import com.sylvester.rustsensei.R
 import com.sylvester.rustsensei.data.AppDatabase
 import com.sylvester.rustsensei.data.ProgressRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class RustSenseiWidget : GlanceAppWidget() {
 
@@ -41,6 +46,17 @@ class RustSenseiWidget : GlanceAppWidget() {
         provideContent {
             GlanceTheme {
                 WidgetContent(context, data)
+            }
+        }
+    }
+
+    override suspend fun providePreview(context: Context, widgetCategory: Int) {
+        provideContent {
+            GlanceTheme {
+                WidgetContent(
+                    context,
+                    WidgetData(streakDays = 7, dueFlashcards = 5, completedExercises = 12)
+                )
             }
         }
     }
@@ -156,4 +172,22 @@ class RustSenseiWidget : GlanceAppWidget() {
 
 class RustSenseiWidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = RustSenseiWidget()
+
+    override fun onEnabled(context: Context) {
+        super.onEnabled(context)
+        // Push a Compose-rendered preview to the Android 15+ widget picker.
+        // Best-effort: on failure the picker falls back to the manifest preview.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+            val pending = goAsync()
+            CoroutineScope(Dispatchers.Default).launch {
+                try {
+                    GlanceAppWidgetManager(context).setWidgetPreviews(RustSenseiWidgetReceiver::class)
+                } catch (_: Exception) {
+                    // ignore — preview is a progressive enhancement
+                } finally {
+                    pending.finish()
+                }
+            }
+        }
+    }
 }

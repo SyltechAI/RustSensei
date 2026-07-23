@@ -25,8 +25,8 @@ import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.LibraryBooks
-import androidx.compose.material.icons.filled.MenuBook
+import androidx.compose.material.icons.automirrored.filled.LibraryBooks
+import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
@@ -387,7 +387,7 @@ private fun typeLabel(type: String): String = when (type) {
 private fun typeIcon(type: String): ImageVector = when (type) {
     "section" -> Icons.Default.Book
     "exercise" -> Icons.Default.Code
-    "reference" -> Icons.Default.LibraryBooks
-    "glossary" -> Icons.Default.MenuBook
+    "reference" -> Icons.AutoMirrored.Filled.LibraryBooks
+    "glossary" -> Icons.AutoMirrored.Filled.MenuBook
     else -> Icons.Default.Search
 }

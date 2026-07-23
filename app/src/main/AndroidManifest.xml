@@ -5,13 +5,13 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <!-- Optimization #8: Keep WiFi alive during large model download -->
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:name=".RustSenseiApplication"
         android:allowBackup="true"
+        android:enableOnBackInvokedCallback="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
@@ -35,7 +35,7 @@
             android:name=".MainActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustResize"
-            android:theme="@style/Theme.RustSensei">
+            android:theme="@style/Theme.RustSensei.Starting">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -45,6 +45,11 @@
         <service
             android:name=".llm.ModelForegroundService"
             android:foregroundServiceType="specialUse"
+            android:exported="false" />
+
+        <service
+            android:name=".llm.ModelDownloadService"
+            android:foregroundServiceType="dataSync"
             android:exported="false" />
 
         <!-- Home Screen Widget -->

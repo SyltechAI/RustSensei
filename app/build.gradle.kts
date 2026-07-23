@@ -27,8 +27,8 @@ android {
         applicationId = "com.sylvester.rustsensei"
         minSdk = 26
         targetSdk = 35
-        versionCode = 10
-        versionName = "1.2.4"
+        versionCode = 11
+        versionName = "1.3.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -81,6 +81,7 @@ android {
 
 dependencies {
     implementation(libs.androidx.core.ktx)
+    implementation(libs.core.splashscreen)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
 
@@ -127,6 +128,11 @@ dependencies {
 
     // Kotlin Serialization
     implementation(libs.kotlinx.serialization.json)
+
+    // Baseline profiles — applies ART profiles (incl. those bundled by Compose)
+    // at install time for faster cold start. Generate an app profile via a
+    // :baselineprofile macrobenchmark module on a device/CI (see PR notes).
+    implementation(libs.profileinstaller)
 
     // Testing
     testImplementation(libs.junit)

@@ -73,7 +73,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import com.sylvester.rustsensei.ui.util.answerFeedback
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -327,7 +327,7 @@ private fun QuizListView(viewModel: QuizViewModel) {
 private fun QuizInProgressView(viewModel: QuizViewModel) {
     val uiState by viewModel.uiState.collectAsState()
     val quiz = uiState.currentQuiz ?: return
-    val question = quiz.questions.getOrNull(uiState.currentQuestionIndex) ?: return
+    if (uiState.currentQuestionIndex !in quiz.questions.indices) return
     val total = quiz.questions.size
     val current = uiState.currentQuestionIndex + 1
     val progress = current.toFloat() / total
@@ -392,7 +392,8 @@ private fun QuizInProgressView(viewModel: QuizViewModel) {
             },
             label = "question",
             modifier = Modifier.weight(1f)
-        ) { _ ->
+        ) { index ->
+            val question = quiz.questions.getOrNull(index) ?: return@AnimatedContent
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -577,7 +578,7 @@ private fun MultipleChoiceAnswers(
                         .border(borderW, borderColor, RoundedCornerShape(12.dp))
                         .background(bgColor)
                         .clickable(enabled = !answered) {
-                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            haptic.answerFeedback(isCorrect)
                             onSelect(index)
                         }
                         .padding(horizontal = 14.dp, vertical = 14.dp),
@@ -662,7 +663,7 @@ private fun TrueFalseAnswers(
                     .border(borderW, borderColor, RoundedCornerShape(14.dp))
                     .background(bgColor)
                     .clickable(enabled = !answered) {
-                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        haptic.answerFeedback(isCorrect)
                         onSelect(value)
                     },
                 contentAlignment = Alignment.Center

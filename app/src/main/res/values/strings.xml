@@ -22,6 +22,9 @@
     <string name="copied">Copied!</string>
     <string name="notification_channel_name">Model Service</string>
     <string name="notification_model_loaded">RustSensei is ready</string>
+    <string name="notification_channel_download_name">Model Download</string>
+    <string name="notification_downloading">Downloading Rust mentor model</string>
+    <string name="notification_downloading_progress">%1$d / %2$d MB</string>
     <string name="storage_warning">This will use approximately 2.5 GB of storage.</string>
 
     <!-- Dashboard -->
