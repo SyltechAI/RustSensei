@@ -35,7 +35,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.LocalFireDepartment
-import androidx.compose.material.icons.filled.MenuBook
+import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Quiz
 import androidx.compose.material.icons.filled.RadioButtonUnchecked
@@ -467,7 +467,7 @@ fun DashboardScreen(
                             "Resume last section"
                         else
                             "${uiState.completedSections} of ${uiState.totalSections} done",
-                        icon = Icons.Default.MenuBook,
+                        icon = Icons.AutoMirrored.Filled.MenuBook,
                         accentColor = MaterialTheme.colorScheme.primary,
                         cardBackground = cardBackground,
                         onClick = {
@@ -553,7 +553,7 @@ fun DashboardScreen(
                     QuickActionCard(
                         title = stringResource(R.string.docs_title),
                         subtitle = stringResource(R.string.docs_card_subtitle),
-                        icon = Icons.Default.MenuBook,
+                        icon = Icons.AutoMirrored.Filled.MenuBook,
                         accentColor = AppColors.current.cyan,
                         cardBackground = cardBackground,
                         onClick = { onNavigateToDocs() }

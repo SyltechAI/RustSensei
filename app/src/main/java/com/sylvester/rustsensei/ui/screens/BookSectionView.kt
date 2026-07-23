@@ -21,7 +21,7 @@ import androidx.compose.material.icons.automirrored.filled.NavigateBefore
 import androidx.compose.material.icons.automirrored.filled.NavigateNext
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.BookmarkBorder
-import androidx.compose.material.icons.filled.Chat
+import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -295,7 +295,7 @@ internal fun BookSectionView(
                     .height(Dimens.CompactTopBarHeight)
                     .semantics { contentDescription = "Ask Sensei about this section" }
             ) {
-                Icon(Icons.Default.Chat, null, modifier = Modifier.size(16.dp))
+                Icon(Icons.AutoMirrored.Filled.Chat, null, modifier = Modifier.size(16.dp))
                 Spacer(modifier = Modifier.width(Spacing.XS))
                 Text("Sensei", style = MaterialTheme.typography.labelMedium)
             }

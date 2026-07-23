@@ -21,10 +21,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Chat
+import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.MenuBook
+import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -93,8 +93,8 @@ import kotlin.reflect.KClass
 
 enum class Tab(val title: String, val icon: ImageVector, val routeClass: KClass<*>) {
     Home("Home", Icons.Default.Home, HomeRoute::class),
-    Learn("Learn", Icons.Default.MenuBook, LearnRoute::class),
-    Chat("Chat", Icons.Default.Chat, ChatTabRoute::class),
+    Learn("Learn", Icons.AutoMirrored.Filled.MenuBook, LearnRoute::class),
+    Chat("Chat", Icons.AutoMirrored.Filled.Chat, ChatTabRoute::class),
     Practice("Practice", Icons.Default.Code, PracticeRoute::class),
     Profile("Settings", Icons.Default.Settings, ProfileRoute::class);
 }

@@ -25,7 +25,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Chat
+import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Lightbulb
@@ -813,7 +813,7 @@ internal fun ExerciseDetailView(
                 shape = RoundedCornerShape(Dimens.CardRadius)
             ) {
                 Icon(
-                    Icons.Default.Chat,
+                    Icons.AutoMirrored.Filled.Chat,
                     contentDescription = "Ask Sensei for help",
                     modifier = Modifier.size(18.dp)
                 )
