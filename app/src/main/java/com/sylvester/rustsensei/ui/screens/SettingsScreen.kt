@@ -630,6 +630,58 @@ fun SettingsScreen(
 
             Spacer(modifier = Modifier.height(Spacing.MD))
 
+            // Syltech card — RustSensei is a Syltech AI Systems product
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(Dimens.CardRadius),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+                )
+            ) {
+                Column(modifier = Modifier.padding(Dimens.CardPadding)) {
+                    Text(
+                        text = "A SYLTECH AI SYSTEM",
+                        style = MaterialTheme.typography.labelMedium,
+                        fontFamily = FontFamily.Monospace,
+                        color = AppColors.current.accent
+                    )
+                    Spacer(modifier = Modifier.height(Spacing.SM))
+                    Text(
+                        text = "RustSensei is a product of Syltech AI Systems, Inc. " +
+                            "Platforms, infrastructure, and the AI that runs on them.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        lineHeight = 18.sp
+                    )
+                    Spacer(modifier = Modifier.height(Spacing.MD))
+
+                    val syltechLinks = listOf(
+                        "syltechai.dev" to "https://syltechai.dev/",
+                        "Syltech on LinkedIn" to "https://www.linkedin.com/company/syltech-ai-systems-inc/"
+                    )
+                    syltechLinks.forEach { (label, url) ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    aboutContext.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                                }
+                                .padding(vertical = Spacing.SM),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "> $label",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = AppColors.current.accent,
+                                fontFamily = FontFamily.Monospace
+                            )
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(Spacing.MD))
+
             // Creator card
             Card(
                 modifier = Modifier.fillMaxWidth(),
