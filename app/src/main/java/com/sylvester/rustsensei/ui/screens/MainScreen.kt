@@ -391,17 +391,24 @@ private fun RustSenseiNavigationBar(
     val inactiveColor = MaterialTheme.colorScheme.onSurfaceVariant
     val activeIconColor = MaterialTheme.colorScheme.onPrimary
     val primaryColor = MaterialTheme.colorScheme.primary
-    val containerColor = MaterialTheme.colorScheme.surfaceContainer
+    val containerColor = MaterialTheme.colorScheme.surface
 
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .height(Dimens.BottomBarHeight)
             .background(containerColor)
     ) {
+        // Hairline top rule — Syltech separates chrome from content
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(1.dp)
+                .background(MaterialTheme.colorScheme.outline)
+        )
         Row(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
+                .height(Dimens.BottomBarHeight)
                 .padding(horizontal = 4.dp),
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
@@ -425,8 +432,8 @@ private fun RustSenseiNavigationBar(
                     ) {
                         Box(
                             modifier = Modifier
-                                .size(width = 64.dp, height = 32.dp)
-                                .clip(RoundedCornerShape(16.dp))
+                                .size(width = 58.dp, height = 30.dp)
+                                .clip(RoundedCornerShape(8.dp))
                                 .then(
                                     if (isSelected) Modifier.background(primaryColor)
                                     else Modifier

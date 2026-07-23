@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="rust_orange">#FFCE412B</color>
-    <color name="rust_orange_light">#FFFF7043</color>
-    <color name="rust_orange_dark">#FF9C1A0A</color>
+    <!-- Syltech brand — names kept for theme/manifest refs; values are Syltech tokens. -->
+    <color name="rust_orange">#FFFF5C00</color>       <!-- Signal Orange -->
+    <color name="rust_orange_light">#FFFF7A2E</color> <!-- Signal (bright) -->
+    <color name="rust_orange_dark">#FF8A3200</color>  <!-- Signal (deep) -->
     <color name="white">#FFFFFFFF</color>
     <color name="black">#FF000000</color>
-    <color name="ic_launcher_background">#FFCE412B</color>
+    <color name="ic_launcher_background">#FF0B0B0C</color> <!-- Ink (icon tile + splash) -->
 </resources>

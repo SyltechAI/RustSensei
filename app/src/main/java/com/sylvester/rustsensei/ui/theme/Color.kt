@@ -2,65 +2,98 @@ package com.sylvester.rustsensei.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// ── Surface Hierarchy (6-step, blue-tinted near-blacks) ──────────────
-val DarkBackground       = Color(0xFF0A0E14)
-val DarkSurface          = Color(0xFF0F1319)
-val DarkSurfaceVariant   = Color(0xFF151A23)
-val DarkSurfaceContainer = Color(0xFF1C2130)
-val DarkSurfaceContainerHigh    = Color(0xFF222838)
-val DarkSurfaceContainerHighest = Color(0xFF2A3040)
+// ═══════════════════════════════════════════════════════════════════════
+// SYLTECH AI SYSTEMS — canonical brand palette
+// Source of truth: syltech-brand-sheet.svg ("Signal Orange on Ink", geometric).
+// Do not add decorative colors. Signal + Amber are the affirmatives; the
+// neutrals carry structure; Danger is the one sanctioned semantic extension.
+// ═══════════════════════════════════════════════════════════════════════
 
-// ── Accent Colors ────────────────────────────────────────────────────
-val RustOrange       = Color(0xFFCE412B)  // Primary — CTAs, nav highlights
-val NeonOrangeBright = Color(0xFFFF6B35)  // Hover/pressed, notification dots
-val RustOrangeDark   = Color(0xFF9C1A0A)  // Container backgrounds, pressed
-val NeonCyan         = Color(0xFF4DEEEA)  // Links, code keywords, streak counters
-val WarningAmber     = Color(0xFFF59E0B)  // Warnings, in-progress badges, XP values
-val SuccessGreen     = Color(0xFF3FB950)  // Correct answers, completed items
-val ErrorNeon        = Color(0xFFFF453A)  // Wrong answers, errors
-val CrispWhite       = Color(0xFFE8ECF2)  // Primary text (15.2:1 contrast)
-val SecondaryText    = Color(0xFF8B95A5)  // Secondary text, timestamps (5.8:1)
-val OutlineDark      = Color(0xFF1E2430)  // Borders, dividers
+// Brand accents
+val SignalOrange = Color(0xFFFF5C00)  // Primary accent — CTAs, emphasis, active state
+val SignalBright = Color(0xFFFF7A2E)  // Pressed / hover
+val SignalDeep   = Color(0xFF8A3200)  // Container / pressed background
+val Amber        = Color(0xFFFFA566)  // Node / warm accent — in-progress, live marker
 
-// Legacy aliases for compat
-val DangerRed = ErrorNeon
-val MediumGray = SecondaryText
+// Neutrals (Ink -> Slate ladder)
+val Ink       = Color(0xFF0B0B0C)  // Background
+val InkRaised = Color(0xFF111114)  // Raised background
+val Slate     = Color(0xFF161619)  // Surface
+val SlateHigh = Color(0xFF1C1C20)  // Surface container
+val Panel     = Color(0xFF26262B)  // Panel / high container
+val PanelHigh = Color(0xFF2A2A2F)  // Highest container
+val Line      = Color(0xFF2A2A2F)  // Borders, dividers
 
-// ── Light Palette ────────────────────────────────────────────────────
-val LightBackground     = Color(0xFFFAFBFD)
-val LightSurface        = Color(0xFFFFFFFF)
-val LightSurfaceVariant = Color(0xFFF0F2F5)
+// Text
+val Mist = Color(0xFFCFCFD4)  // Primary text on dark
+val Ash  = Color(0xFF8F8F97)  // Secondary text
 
-// ── Semantic Status Colors ───────────────────────────────────────────
-val DifficultyBeginner     = SuccessGreen
-val DifficultyIntermediate = WarningAmber
-val DifficultyAdvanced     = ErrorNeon
+// Semantic — Signal/Amber are affirmatives; Danger is the only sanctioned
+// extension (correctness/error legibility), never used decoratively.
+val Positive = SignalOrange  // Correct, complete
+val Active   = Amber         // In-progress
+val Danger   = Color(0xFFC8503C)  // Incorrect, error
+val Neutral  = Ash
+
+// ── Legacy names -> Syltech tokens (documented remap; keeps existing refs compiling) ──
+val RustOrange       = SignalOrange
+val NeonOrangeBright = SignalBright
+val RustOrangeDark   = SignalDeep
+val NeonCyan         = Amber          // cyan retired -> amber node
+val WarningAmber     = Amber
+val SuccessGreen     = Positive       // green retired -> Signal Orange affirmative
+val ErrorNeon        = Danger
+val CrispWhite       = Mist
+val SecondaryText    = Ash
+val OutlineDark      = Line
+val DangerRed        = Danger
+val MediumGray       = Ash
+
+// Dark surface ladder (names consumed by Theme.kt) -> Ink -> Slate
+val DarkBackground              = Ink
+val DarkSurface                 = InkRaised
+val DarkSurfaceVariant          = Slate
+val DarkSurfaceContainer        = SlateHigh
+val DarkSurfaceContainerHigh    = Panel
+val DarkSurfaceContainerHighest = PanelHigh
+
+// Light palette — dark-first stays the default; light is a disciplined
+// Syltech derivation (warm paper neutrals + Signal Orange, Ink text).
+val LightBackground     = Color(0xFFF4F2EE)
+val LightSurface        = Color(0xFFFBFAF7)
+val LightSurfaceVariant = Color(0xFFEDEBE6)
+
+// Difficulty / status
+val DifficultyBeginner     = Positive
+val DifficultyIntermediate = Active
+val DifficultyAdvanced     = Danger
 
 // Code rendering
-val InlineCodeBackground = Color(0xFF1C2130)  // surfaceContainer
-val InlineCodeText       = Color(0xFFE8975A)  // warm orange
-val CodeBlockBackground  = Color(0xFF0A0E14)  // deepest surface
+val InlineCodeBackground = SlateHigh
+val InlineCodeText       = Amber
+val CodeBlockBackground  = Ink
 
-// Completion states
-val CompletedBadge  = SuccessGreen
-val InProgressBadge = WarningAmber
-val NotStartedBadge = SecondaryText
+// Completion — distinct: complete = orange, in-progress = amber, not-started = ash
+val CompletedBadge  = Positive
+val InProgressBadge = Active
+val NotStartedBadge = Ash
 
-// ── Syntax Highlighting Palette ──────────────────────────────────────
-val SyntaxKeyword   = Color(0xFFFF7B72)  // fn, let, mut, pub
-val SyntaxString    = Color(0xFFE8975A)  // Strings
-val SyntaxType      = Color(0xFF79C0FF)  // Types / Structs
-val SyntaxFunction  = Color(0xFFD2A8FF)  // Functions / Methods
-val SyntaxComment   = Color(0xFF6B7280)  // Comments
-val SyntaxNumber    = Color(0xFF7EE787)  // Numbers / Literals
-val SyntaxMacro     = Color(0xFFFFA657)  // Macros (println!, vec!)
-val SyntaxLifetime  = Color(0xFFF778BA)  // Lifetimes ('a, 'static)
-val SyntaxAttribute = Color(0xFFA5D6FF)  // Attributes (#[derive])
-val SyntaxOperator  = Color(0xFFE8ECF2)  // Operators
-val SyntaxLineNumber = Color(0xFF3B4252) // Line numbers
+// Syntax highlighting — a functional editor theme (code semantics, not UI chrome);
+// kept as a considered multi-hue scheme, anchored warm toward the brand.
+val SyntaxKeyword    = Color(0xFFFF7B72)
+val SyntaxString     = Color(0xFFE8975A)
+val SyntaxType       = Color(0xFF79C0FF)
+val SyntaxFunction   = Color(0xFFD2A8FF)
+val SyntaxComment    = Color(0xFF6E7681)
+val SyntaxNumber     = Color(0xFF7EE787)
+val SyntaxMacro      = Color(0xFFFFA657)
+val SyntaxLifetime   = Color(0xFFF778BA)
+val SyntaxAttribute  = Color(0xFFA5D6FF)
+val SyntaxOperator   = Mist
+val SyntaxLineNumber = Color(0xFF3B4148)
 
-// ── Glow Effects ─────────────────────────────────────────────────────
-val PrimaryGlow = Color(0x40CE412B)    // 0dp 0dp 12dp
-val CyanGlow    = Color(0x304DEEEA)    // 0dp 0dp 8dp
-val SuccessGlow = Color(0x303FB950)    // 0dp 0dp 8dp
-val ErrorGlow   = Color(0x30FF453A)    // 0dp 0dp 8dp
+// Glow — restrained (Syltech is flatter than the old neon look)
+val PrimaryGlow = Color(0x33FF5C00)
+val CyanGlow    = Color(0x26FFA566)
+val SuccessGlow = Color(0x33FF5C00)
+val ErrorGlow   = Color(0x26C8503C)

@@ -5,103 +5,21 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Ferris the Crab (RustSensei) — white silhouette on transparent -->
-    <!-- Safe zone: 66dp circle centered at 54,54 (bounds ~21-87) -->
+    <!-- RustSensei mark, Syltech family: a Signal Orange prompt chevron with
+         one Amber node, echoing the Syltech S-mark. Geometric, no mascot. -->
+    <!-- Safe zone: 66dp circle centered at 54,54 (bounds ~21-87). -->
 
-    <!-- Left claw — curved pincer extending up-left from body -->
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M37,50 C33,42 27,36 29,31 C31,26 37,28 39,34 C41,28 45,26 47,31 C49,36 43,42 41,50 Z" />
-
-    <!-- Right claw — mirror of left -->
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M71,50 C75,42 81,36 79,31 C77,26 71,28 69,34 C67,28 63,26 61,31 C59,36 65,42 67,50 Z" />
-
-    <!-- Body — rounded dome shape -->
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M33,58 C33,48 42,41 54,41 C66,41 75,48 75,58 L75,66 C75,72 66,77 54,77 C42,77 33,72 33,66 Z" />
-
-    <!-- Left eye — dark circle -->
-    <path
-        android:fillColor="#CE412B"
-        android:pathData="M44,54 A3.5,3.5 0 1,1 51,54 A3.5,3.5 0 1,1 44,54" />
-
-    <!-- Right eye — dark circle -->
-    <path
-        android:fillColor="#CE412B"
-        android:pathData="M57,54 A3.5,3.5 0 1,1 64,54 A3.5,3.5 0 1,1 57,54" />
-
-    <!-- Smile — small upward arc -->
+    <!-- ">" prompt chevron -->
     <path
         android:fillColor="#00000000"
-        android:pathData="M48,63 Q54,68 60,63"
-        android:strokeWidth="1.5"
-        android:strokeColor="#CE412B" />
+        android:pathData="M36,32 L66,54 L36,76"
+        android:strokeColor="#FF5C00"
+        android:strokeWidth="12"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
 
-    <!-- Sensei headband — horizontal band across forehead -->
+    <!-- Amber node -->
     <path
-        android:fillColor="#CE412B"
-        android:pathData="M35,47 L73,47 L73,50 L35,50 Z" />
-
-    <!-- Headband knot — small circle on the left side -->
-    <path
-        android:fillColor="#CE412B"
-        android:pathData="M33,46 A3,3 0 1,1 33,52 A3,3 0 1,1 33,46" />
-
-    <!-- Headband tail ribbons — two short lines from the knot -->
-    <path
-        android:fillColor="#00000000"
-        android:pathData="M31,49 L25,54"
-        android:strokeWidth="2"
-        android:strokeColor="#CE412B"
-        android:strokeLineCap="round" />
-    <path
-        android:fillColor="#00000000"
-        android:pathData="M31,50 L26,58"
-        android:strokeWidth="2"
-        android:strokeColor="#CE412B"
-        android:strokeLineCap="round" />
-
-    <!-- Left legs — three small lines extending from body -->
-    <path
-        android:fillColor="#00000000"
-        android:pathData="M35,58 L26,54"
-        android:strokeWidth="2.5"
-        android:strokeColor="#FFFFFF"
-        android:strokeLineCap="round" />
-    <path
-        android:fillColor="#00000000"
-        android:pathData="M34,63 L24,63"
-        android:strokeWidth="2.5"
-        android:strokeColor="#FFFFFF"
-        android:strokeLineCap="round" />
-    <path
-        android:fillColor="#00000000"
-        android:pathData="M35,68 L26,72"
-        android:strokeWidth="2.5"
-        android:strokeColor="#FFFFFF"
-        android:strokeLineCap="round" />
-
-    <!-- Right legs — mirror of left -->
-    <path
-        android:fillColor="#00000000"
-        android:pathData="M73,58 L82,54"
-        android:strokeWidth="2.5"
-        android:strokeColor="#FFFFFF"
-        android:strokeLineCap="round" />
-    <path
-        android:fillColor="#00000000"
-        android:pathData="M74,63 L84,63"
-        android:strokeWidth="2.5"
-        android:strokeColor="#FFFFFF"
-        android:strokeLineCap="round" />
-    <path
-        android:fillColor="#00000000"
-        android:pathData="M73,68 L82,72"
-        android:strokeWidth="2.5"
-        android:strokeColor="#FFFFFF"
-        android:strokeLineCap="round" />
-
+        android:fillColor="#FFA566"
+        android:pathData="M72,34 m-6,0 a6,6 0 1,0 12,0 a6,6 0 1,0 -12,0" />
 </vector>

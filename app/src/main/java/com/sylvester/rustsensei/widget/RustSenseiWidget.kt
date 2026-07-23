@@ -79,10 +79,10 @@ class RustSenseiWidget : GlanceAppWidget() {
 
     @Composable
     private fun WidgetContent(context: Context, data: WidgetData) {
-        val bgColor = ColorProvider(Color(0xFF0A0E14))
-        val textColor = ColorProvider(Color(0xFFE8ECF0))
-        val accentColor = ColorProvider(Color(0xFFCE412B))
-        val subtextColor = ColorProvider(Color(0xFF8B95A5))
+        val bgColor = ColorProvider(Color(0xFF0B0B0C))      // Ink
+        val textColor = ColorProvider(Color(0xFFCFCFD4))    // Mist
+        val accentColor = ColorProvider(Color(0xFFFF5C00))  // Signal Orange
+        val subtextColor = ColorProvider(Color(0xFF8F8F97)) // Ash
 
         Column(
             modifier = GlanceModifier
