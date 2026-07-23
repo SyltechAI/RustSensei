@@ -13,14 +13,12 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
-// ── Theme-aware accent colors ─────────────────────────────────────
-// Neon accents look great on dark backgrounds but are harsh on white.
-// This palette provides toned-down variants for light mode.
-
+// ── Theme-aware accent palette (Syltech: Signal Orange on Ink) ────────
+// Field names kept for source compatibility; values now map to Syltech tokens.
 @Immutable
 data class AppColorPalette(
     val accent: Color,
-    val cyan: Color,
+    val cyan: Color,          // legacy slot — now the Amber node accent
     val amber: Color,
     val success: Color,
     val error: Color,
@@ -37,39 +35,39 @@ data class AppColorPalette(
 )
 
 private val DarkAccentPalette = AppColorPalette(
-    accent = RustOrange,
-    cyan = NeonCyan,
-    amber = WarningAmber,
-    success = SuccessGreen,
-    error = ErrorNeon,
-    codeBackground = Color(0xFF0A0E14),
-    inlineCodeBg = Color(0xFF1C2130),
-    inlineCodeText = Color(0xFFE8975A),
-    userBubbleBg = Color(0xFF2A1510),
-    aiBubbleBg = DarkSurfaceContainerHigh,
-    codeBg = Color(0xFF06080C),
-    codeHeader = Color(0xFF0C1018),
-    codeText = Color(0xFFD4D4D4),
-    pathAccentOrange = NeonOrangeBright,
-    pathAccentPurple = Color(0xFFA78BFA)
+    accent = SignalOrange,
+    cyan = Amber,
+    amber = Amber,
+    success = Positive,
+    error = Danger,
+    codeBackground = Ink,
+    inlineCodeBg = SlateHigh,
+    inlineCodeText = Amber,
+    userBubbleBg = Color(0xFF2A1608),   // warm ink, signal-tinted
+    aiBubbleBg = Panel,
+    codeBg = Ink,
+    codeHeader = Slate,
+    codeText = Mist,
+    pathAccentOrange = SignalBright,
+    pathAccentPurple = Amber            // purple retired -> amber
 )
 
 private val LightAccentPalette = AppColorPalette(
-    accent = Color(0xFFC03820),        // deeper rust — readable on white
-    cyan = Color(0xFF0D9488),           // teal-600 — pleasant on light surfaces
-    amber = Color(0xFFB45309),          // amber-700 — warm but not glaring
-    success = Color(0xFF15803D),        // green-700 — rich without neon
-    error = Color(0xFFDC2626),          // red-600 — clear but not neon
-    codeBackground = Color(0xFFF1F5F9), // slate-100 — soft code blocks
-    inlineCodeBg = Color(0xFFE8EDF2),
-    inlineCodeText = Color(0xFFC05621),
-    userBubbleBg = Color(0xFFF4DDD6),   // soft peach — warm on white
-    aiBubbleBg = Color(0xFFE6E9EF),     // surfaceContainerHigh equivalent
-    codeBg = Color(0xFF06080C),         // code blocks stay dark
-    codeHeader = Color(0xFF0C1018),     // code blocks stay dark
-    codeText = Color(0xFFD4D4D4),       // code blocks stay dark
-    pathAccentOrange = Color(0xFFD4531F),
-    pathAccentPurple = Color(0xFF7C5CBF)
+    accent = Color(0xFFC7481A),         // Signal, darkened for light surfaces
+    cyan = Color(0xFFB4692A),
+    amber = Color(0xFFB4692A),
+    success = Color(0xFFC7481A),
+    error = Color(0xFFB23A28),
+    codeBackground = Ink,               // code stays dark on both themes
+    inlineCodeBg = Color(0xFFEDE7DE),
+    inlineCodeText = Color(0xFFB4551F),
+    userBubbleBg = Color(0xFFF3E4D6),
+    aiBubbleBg = Color(0xFFEDEBE6),
+    codeBg = Ink,
+    codeHeader = Slate,
+    codeText = Mist,
+    pathAccentOrange = Color(0xFFC7481A),
+    pathAccentPurple = Color(0xFFB4692A)
 )
 
 val LocalAppColors = staticCompositionLocalOf { DarkAccentPalette }
@@ -80,86 +78,86 @@ object AppColors {
 }
 
 private val DarkColorScheme = darkColorScheme(
-    primary = RustOrange,
-    onPrimary = Color.White,
-    primaryContainer = RustOrangeDark,
-    onPrimaryContainer = Color(0xFFFFDAD4),
-    secondary = NeonCyan,
-    onSecondary = Color.Black,
-    secondaryContainer = Color(0xFF003D3C),
-    onSecondaryContainer = Color(0xFFB2FFFD),
-    tertiary = WarningAmber,
-    onTertiary = Color.Black,
-    tertiaryContainer = Color(0xFF5A2800),
-    onTertiaryContainer = Color(0xFFFFDDB3),
-    error = ErrorNeon,
+    primary = SignalOrange,
+    onPrimary = Ink,
+    primaryContainer = SignalDeep,
+    onPrimaryContainer = Color(0xFFFFD9BE),
+    secondary = Amber,
+    onSecondary = Ink,
+    secondaryContainer = Color(0xFF3A2410),
+    onSecondaryContainer = Color(0xFFFFD9BE),
+    tertiary = Amber,
+    onTertiary = Ink,
+    tertiaryContainer = Color(0xFF3A2410),
+    onTertiaryContainer = Color(0xFFFFD9BE),
+    error = Danger,
     onError = Color.White,
-    errorContainer = Color(0xFF93000A),
-    onErrorContainer = Color(0xFFFFDAD6),
-    background = DarkBackground,
-    onBackground = CrispWhite,
-    surface = DarkSurface,
-    onSurface = CrispWhite,
-    surfaceVariant = DarkSurfaceVariant,
-    onSurfaceVariant = SecondaryText,
-    outline = OutlineDark,
-    outlineVariant = Color(0xFF151A23),
-    inverseSurface = CrispWhite,
-    inverseOnSurface = DarkBackground,
-    surfaceContainerHighest = DarkSurfaceContainerHighest,
-    surfaceContainerHigh = DarkSurfaceContainerHigh,
-    surfaceContainer = DarkSurfaceContainer,
-    surfaceContainerLow = DarkSurface,
-    surfaceContainerLowest = DarkBackground
+    errorContainer = Color(0xFF4A1A12),
+    onErrorContainer = Color(0xFFFFD9D2),
+    background = Ink,
+    onBackground = Mist,
+    surface = InkRaised,
+    onSurface = Mist,
+    surfaceVariant = Slate,
+    onSurfaceVariant = Ash,
+    outline = Line,
+    outlineVariant = SlateHigh,
+    inverseSurface = Mist,
+    inverseOnSurface = Ink,
+    surfaceContainerHighest = PanelHigh,
+    surfaceContainerHigh = Panel,
+    surfaceContainer = SlateHigh,
+    surfaceContainerLow = Slate,
+    surfaceContainerLowest = Ink
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = RustOrange,
+    primary = Color(0xFFC7481A),
     onPrimary = Color.White,
-    primaryContainer = Color(0xFFFFDBD1),
-    onPrimaryContainer = RustOrangeDark,
-    secondary = Color(0xFF00897B),
+    primaryContainer = Color(0xFFFFDBCB),
+    onPrimaryContainer = Color(0xFF7A2C00),
+    secondary = Color(0xFF9A5A2A),
     onSecondary = Color.White,
-    secondaryContainer = Color(0xFFB2DFDB),
-    onSecondaryContainer = Color(0xFF003D3C),
-    tertiary = Color(0xFFF59E0B),
-    onTertiary = Color.Black,
-    tertiaryContainer = Color(0xFFFFDDB3),
-    onTertiaryContainer = Color(0xFF5A3600),
-    error = Color(0xFFBA1A1A),
+    secondaryContainer = Color(0xFFF6DFC9),
+    onSecondaryContainer = Color(0xFF4A2A0E),
+    tertiary = Color(0xFF9A5A2A),
+    onTertiary = Color.White,
+    tertiaryContainer = Color(0xFFF6DFC9),
+    onTertiaryContainer = Color(0xFF4A2A0E),
+    error = Color(0xFFB23A28),
     onError = Color.White,
-    errorContainer = Color(0xFFFFDAD6),
-    onErrorContainer = Color(0xFF410002),
+    errorContainer = Color(0xFFFFDAD4),
+    onErrorContainer = Color(0xFF5A1B10),
     background = LightBackground,
-    onBackground = Color(0xFF12141A),
+    onBackground = Ink,
     surface = LightSurface,
-    onSurface = Color(0xFF12141A),
+    onSurface = Ink,
     surfaceVariant = LightSurfaceVariant,
-    onSurfaceVariant = Color(0xFF4A505C),
-    outline = Color(0xFFCDD2DA),
-    outlineVariant = Color(0xFFDFE2E8),
-    inverseSurface = Color(0xFF12141A),
+    onSurfaceVariant = Color(0xFF57534E),
+    outline = Color(0xFFD6D0C7),
+    outlineVariant = Color(0xFFE6E2DB),
+    inverseSurface = Ink,
     inverseOnSurface = LightBackground,
-    surfaceContainerHighest = Color(0xFFDDE0E6),
-    surfaceContainerHigh = Color(0xFFE6E9EF),
+    surfaceContainerHighest = Color(0xFFE4E0D8),
+    surfaceContainerHigh = Color(0xFFEDEBE6),
     surfaceContainer = LightSurfaceVariant,
     surfaceContainerLow = LightSurface,
     surfaceContainerLowest = Color.White
 )
 
-// M3 Shape system — consistent corner radii across all components
+// Syltech geometry — flat, small radii (was 4 / 8 / 12 / 16 / 28)
 val RustSenseiShapes = Shapes(
-    extraSmall = RoundedCornerShape(4.dp),
-    small = RoundedCornerShape(8.dp),
-    medium = RoundedCornerShape(12.dp),
-    large = RoundedCornerShape(16.dp),
-    extraLarge = RoundedCornerShape(28.dp)
+    extraSmall = RoundedCornerShape(2.dp),
+    small = RoundedCornerShape(4.dp),
+    medium = RoundedCornerShape(6.dp),
+    large = RoundedCornerShape(8.dp),
+    extraLarge = RoundedCornerShape(12.dp)
 )
 
 @Composable
 fun RustSenseiTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = false,  // Keep disabled — Rust Orange identity is too important
+    dynamicColor: Boolean = false,  // Off by design — Signal Orange is the Syltech identity
     content: @Composable () -> Unit
 ) {
     val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
