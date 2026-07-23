@@ -1,0 +1,10 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- API 31+ splash: adds the Syltech company wordmark as the branding image.
+         Older devices use the base Theme.RustSensei.Starting (no branding). -->
+    <style name="Theme.RustSensei.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/ic_launcher_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+        <item name="android:windowSplashScreenBrandingImage">@drawable/syltech_wordmark</item>
+        <item name="postSplashScreenTheme">@style/Theme.RustSensei</item>
+    </style>
+</resources>

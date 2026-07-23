@@ -14,8 +14,6 @@
     <style name="Theme.RustSensei.Starting" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">@color/ic_launcher_background</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
-        <!-- Syltech company wordmark at the bottom of the splash (API 31+; older ignores). -->
-        <item name="android:windowSplashScreenBrandingImage">@drawable/syltech_wordmark</item>
         <item name="postSplashScreenTheme">@style/Theme.RustSensei</item>
     </style>
 </resources>
