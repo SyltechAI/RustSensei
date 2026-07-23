@@ -83,6 +83,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sylvester.rustsensei.data.QuizQuestion
 import com.sylvester.rustsensei.ui.components.ConfettiOverlay
+import com.sylvester.rustsensei.ui.components.SpecHeader
 import com.sylvester.rustsensei.ui.theme.AppColors
 import com.sylvester.rustsensei.ui.theme.DarkSurfaceContainer
 import com.sylvester.rustsensei.ui.theme.DarkSurfaceContainerHigh
@@ -131,14 +132,8 @@ private fun QuizListView(viewModel: QuizViewModel) {
         // Header
         item {
             Column(modifier = Modifier.padding(bottom = 8.dp)) {
-                Text(
-                    text = "Quizzes",
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontFamily = FontFamily.Monospace,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Spacer(modifier = Modifier.height(4.dp))
+                SpecHeader(eyebrow = "RustSensei / Quiz", title = "Quizzes")
+                Spacer(modifier = Modifier.height(6.dp))
                 Text(
                     text = "Test your understanding of each topic",
                     style = MaterialTheme.typography.bodyMedium,
@@ -486,7 +481,7 @@ private fun QuizInProgressView(viewModel: QuizViewModel) {
                                 }
                                 Spacer(modifier = Modifier.width(10.dp))
                                 Text(
-                                    text = if (isCorrect) "Correct!" else "Not quite",
+                                    text = if (isCorrect) "CORRECT" else "NOT QUITE",
                                     style = MaterialTheme.typography.titleSmall,
                                     fontWeight = FontWeight.Bold,
                                     color = accentColor
