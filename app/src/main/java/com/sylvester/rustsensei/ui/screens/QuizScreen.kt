@@ -73,7 +73,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import com.sylvester.rustsensei.ui.util.answerFeedback
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -577,7 +577,7 @@ private fun MultipleChoiceAnswers(
                         .border(borderW, borderColor, RoundedCornerShape(12.dp))
                         .background(bgColor)
                         .clickable(enabled = !answered) {
-                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            haptic.answerFeedback(isCorrect)
                             onSelect(index)
                         }
                         .padding(horizontal = 14.dp, vertical = 14.dp),
@@ -662,7 +662,7 @@ private fun TrueFalseAnswers(
                     .border(borderW, borderColor, RoundedCornerShape(14.dp))
                     .background(bgColor)
                     .clickable(enabled = !answered) {
-                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        haptic.answerFeedback(isCorrect)
                         onSelect(value)
                     },
                 contentAlignment = Alignment.Center

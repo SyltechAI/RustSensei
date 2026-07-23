@@ -30,7 +30,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import com.sylvester.rustsensei.ui.util.confirm
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
@@ -134,7 +134,7 @@ fun InputBar(
                 // Send / stop button: 48dp filled circle (M3 min touch target)
                 FilledIconButton(
                     onClick = {
-                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        haptic.confirm()
                         if (isGenerating) onStop() else onSend()
                     },
                     modifier = Modifier

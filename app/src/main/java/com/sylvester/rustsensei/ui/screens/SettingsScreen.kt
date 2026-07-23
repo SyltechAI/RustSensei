@@ -56,6 +56,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
+import com.sylvester.rustsensei.ui.util.toggleFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
@@ -208,9 +210,13 @@ fun SettingsScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
+                    val haptic = LocalHapticFeedback.current
                     Switch(
                         checked = remindersEnabled,
-                        onCheckedChange = onRemindersToggled,
+                        onCheckedChange = { checked ->
+                            haptic.toggleFeedback(checked)
+                            onRemindersToggled(checked)
+                        },
                         colors = SwitchDefaults.colors(
                             checkedThumbColor = AppColors.current.accent,
                             checkedTrackColor = AppColors.current.accent.copy(alpha = Alpha.MUTED)
