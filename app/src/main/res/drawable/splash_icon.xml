@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Splash mark: a larger version of the RustSensei prompt chevron + amber
+         node. Bigger than ic_launcher_foreground because the system splash does
+         not apply the launcher's 150% upscale, so the launcher foreground reads
+         too small here. -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M32,28 L72,54 L32,80"
+        android:strokeColor="#FF5C00"
+        android:strokeWidth="14"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:fillColor="#FFA566"
+        android:pathData="M78,32 m-7,0 a7,7 0 1,0 14,0 a7,7 0 1,0 -14,0" />
+</vector>

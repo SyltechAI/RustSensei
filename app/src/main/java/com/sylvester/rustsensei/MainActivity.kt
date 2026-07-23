@@ -37,7 +37,7 @@ class MainActivity : ComponentActivity() {
         // ~1 frame, so it looks like no splash appears at all.
         val splashStart = System.currentTimeMillis()
         splashScreen.setKeepOnScreenCondition {
-            System.currentTimeMillis() - splashStart < 700L
+            System.currentTimeMillis() - splashStart < 1500L
         }
         themePreference.value = ThemePreference.fromString(preferencesManager.getThemePreference())
         enableEdgeToEdge()
