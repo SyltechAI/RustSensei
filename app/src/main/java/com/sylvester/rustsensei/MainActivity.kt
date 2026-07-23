@@ -14,6 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import com.sylvester.rustsensei.data.PreferencesManager
 import com.sylvester.rustsensei.data.ThemePreference
+import com.sylvester.rustsensei.ui.components.AppWithSplash
 import com.sylvester.rustsensei.ui.theme.RustSenseiTheme
 import com.sylvester.rustsensei.work.ReminderScheduler
 import dagger.hilt.android.AndroidEntryPoint
@@ -29,16 +30,10 @@ class MainActivity : ComponentActivity() {
     val themePreference = MutableStateFlow(ThemePreference.SYSTEM)
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        val splashScreen = installSplashScreen()
+        // Brief system splash (Ink + mark) hands off to the full-screen brand
+        // splash drawn in Compose (AppWithSplash), which carries the branding.
+        installSplashScreen()
         super.onCreate(savedInstanceState)
-        // Hold the splash briefly so the Syltech branding is actually visible.
-        // Without this, a fast (release / baseline-profiled) cold start draws its
-        // first frame almost immediately and the system dismisses the splash in
-        // ~1 frame, so it looks like no splash appears at all.
-        val splashStart = System.currentTimeMillis()
-        splashScreen.setKeepOnScreenCondition {
-            System.currentTimeMillis() - splashStart < 1500L
-        }
         themePreference.value = ThemePreference.fromString(preferencesManager.getThemePreference())
         enableEdgeToEdge()
         setContent {
@@ -54,10 +49,12 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    RustSenseiApp(
-                        preferencesManager = preferencesManager,
-                        reminderScheduler = reminderScheduler
-                    )
+                    AppWithSplash {
+                        RustSenseiApp(
+                            preferencesManager = preferencesManager,
+                            reminderScheduler = reminderScheduler
+                        )
+                    }
                 }
             }
         }
