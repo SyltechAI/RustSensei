@@ -129,6 +129,11 @@ dependencies {
     // Kotlin Serialization
     implementation(libs.kotlinx.serialization.json)
 
+    // Baseline profiles — applies ART profiles (incl. those bundled by Compose)
+    // at install time for faster cold start. Generate an app profile via a
+    // :baselineprofile macrobenchmark module on a device/CI (see PR notes).
+    implementation(libs.profileinstaller)
+
     // Testing
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
