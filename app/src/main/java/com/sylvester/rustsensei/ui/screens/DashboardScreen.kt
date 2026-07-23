@@ -80,6 +80,7 @@ import com.sylvester.rustsensei.R
 import com.sylvester.rustsensei.ui.components.ActivityChart
 import com.sylvester.rustsensei.ui.components.ConfettiOverlay
 import com.sylvester.rustsensei.ui.components.ProgressRing
+import com.sylvester.rustsensei.ui.components.SpecHeader
 import com.sylvester.rustsensei.ui.components.SkeletonBox
 import com.sylvester.rustsensei.ui.theme.Alpha
 import com.sylvester.rustsensei.ui.theme.Dimens
@@ -181,72 +182,68 @@ fun DashboardScreen(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 12.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .padding(top = 8.dp, bottom = 4.dp)
             ) {
-                // Greeting
-                Text(
-                    text = greeting,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center
-                )
+                SpecHeader(eyebrow = "RustSensei / Dashboard", title = greeting)
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(18.dp))
 
-                // Optimization #5: Lifecycle-aware flame animation — pauses when
-                // the screen is not visible (e.g. user switches to another tab),
-                // saving CPU/GPU draw cycles and battery.
+                // Streak readout + week ticks — spec-sheet style, amber node = today
                 Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.Bottom
                 ) {
-                    val flameScale = remember { Animatable(1f) }
-                    val lifecycleOwner = LocalLifecycleOwner.current
-                    LaunchedEffect(lifecycleOwner) {
-                        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                            while (isActive) {
-                                flameScale.animateTo(1.05f, tween(750))
-                                flameScale.animateTo(0.95f, tween(750))
-                            }
+                    Column {
+                        Text(
+                            text = "STREAK",
+                            style = MaterialTheme.typography.labelSmall,
+                            fontFamily = FontFamily.Monospace,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Row(verticalAlignment = Alignment.Bottom) {
+                            Text(
+                                text = "${uiState.studyStreak}",
+                                style = MaterialTheme.typography.headlineLarge,
+                                fontFamily = FontFamily.Monospace,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = "DAYS",
+                                style = MaterialTheme.typography.labelSmall,
+                                fontFamily = FontFamily.Monospace,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(bottom = 6.dp)
+                            )
                         }
                     }
-                    Icon(
-                        imageVector = Icons.Default.LocalFireDepartment,
-                        contentDescription = "Streak flame",
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier
-                            .size(36.dp)
-                            .scale(flameScale.value)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "${uiState.studyStreak}-day streak",
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontFamily = FontFamily.Monospace,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
 
-                Spacer(modifier = Modifier.height(20.dp))
+                    Spacer(modifier = Modifier.weight(1f))
 
-                // Weekly dots: 7 circles (Mo-Su) — larger for better visibility
-                if (uiState.weekActivity.isNotEmpty()) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        uiState.weekActivity.forEachIndexed { index, day ->
-                            val isToday = index == uiState.weekActivity.lastIndex
-                            WeekDayDot(
-                                label = day.label,
-                                level = day.level,
-                                isToday = isToday,
-                                primaryColor = MaterialTheme.colorScheme.primary,
-                                surfaceVariantColor = MaterialTheme.colorScheme.surfaceVariant
-                            )
+                    if (uiState.weekActivity.isNotEmpty()) {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                            verticalAlignment = Alignment.Bottom,
+                            modifier = Modifier.padding(bottom = 4.dp)
+                        ) {
+                            uiState.weekActivity.forEachIndexed { index, day ->
+                                val isToday = index == uiState.weekActivity.lastIndex
+                                Box(
+                                    modifier = Modifier
+                                        .width(8.dp)
+                                        .height(if (isToday) 22.dp else 16.dp)
+                                        .clip(RoundedCornerShape(1.dp))
+                                        .background(
+                                            when {
+                                                isToday -> MaterialTheme.colorScheme.secondary
+                                                day.level > 0 -> MaterialTheme.colorScheme.primary
+                                                else -> MaterialTheme.colorScheme.surfaceVariant
+                                            }
+                                        )
+                                )
+                            }
                         }
                     }
                 }
@@ -783,76 +780,6 @@ fun DashboardScreen(
 // =====================================================================
 // Private composables
 // =====================================================================
-
-@Composable
-private fun WeekDayDot(
-    label: String,
-    level: Int,
-    isToday: Boolean,
-    primaryColor: Color,
-    surfaceVariantColor: Color
-) {
-    // Larger dots (16dp) for better visibility per WCAG touch guidelines
-    val dotSize = 16.dp
-
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        // Day label above dot
-        Text(
-            text = label.take(2), // Mo, Tu, We, Th, Fr, Sa, Su
-            style = MaterialTheme.typography.labelSmall,
-            color = if (isToday) primaryColor
-            else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-        )
-
-        Spacer(modifier = Modifier.height(6.dp))
-
-        when {
-            // Optimization #5: Lifecycle-aware pulse — stops when screen is offscreen
-            isToday && level == 0 -> {
-                val pulseAlpha = remember { Animatable(0.3f) }
-                val lifecycleOwner = LocalLifecycleOwner.current
-                LaunchedEffect(lifecycleOwner) {
-                    lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                        while (isActive) {
-                            pulseAlpha.animateTo(1f, tween(600))
-                            pulseAlpha.animateTo(0.3f, tween(600))
-                        }
-                    }
-                }
-                Box(
-                    modifier = Modifier
-                        .size(dotSize)
-                        .clip(CircleShape)
-                        .border(
-                            width = 2.dp,
-                            color = primaryColor.copy(alpha = pulseAlpha.value),
-                            shape = CircleShape
-                        )
-                )
-            }
-            // Completed day (today or past): filled primary
-            level > 0 -> {
-                Box(
-                    modifier = Modifier
-                        .size(dotSize)
-                        .clip(CircleShape)
-                        .background(primaryColor)
-                )
-            }
-            // Missed past day: surfaceVariant
-            else -> {
-                Box(
-                    modifier = Modifier
-                        .size(dotSize)
-                        .clip(CircleShape)
-                        .background(surfaceVariantColor)
-                )
-            }
-        }
-    }
-}
 
 @Composable
 private fun DailyGoalCheckItem(
