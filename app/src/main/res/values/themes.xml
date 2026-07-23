@@ -8,4 +8,12 @@
         <item name="colorOnSecondary">@color/white</item>
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
     </style>
+
+    <!-- Splash screen (androidx.core:core-splashscreen). Shows the launcher
+         icon on the brand background, then hands off to Theme.RustSensei. -->
+    <style name="Theme.RustSensei.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/ic_launcher_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+        <item name="postSplashScreenTheme">@style/Theme.RustSensei</item>
+    </style>
 </resources>
