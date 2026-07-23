@@ -327,7 +327,7 @@ private fun QuizListView(viewModel: QuizViewModel) {
 private fun QuizInProgressView(viewModel: QuizViewModel) {
     val uiState by viewModel.uiState.collectAsState()
     val quiz = uiState.currentQuiz ?: return
-    val question = quiz.questions.getOrNull(uiState.currentQuestionIndex) ?: return
+    if (uiState.currentQuestionIndex !in quiz.questions.indices) return
     val total = quiz.questions.size
     val current = uiState.currentQuestionIndex + 1
     val progress = current.toFloat() / total
@@ -392,7 +392,8 @@ private fun QuizInProgressView(viewModel: QuizViewModel) {
             },
             label = "question",
             modifier = Modifier.weight(1f)
-        ) { _ ->
+        ) { index ->
+            val question = quiz.questions.getOrNull(index) ?: return@AnimatedContent
             Column(
                 modifier = Modifier
                     .fillMaxSize()
