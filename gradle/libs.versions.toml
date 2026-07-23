@@ -24,7 +24,7 @@ litertlm = "0.9.0-alpha06"
 hilt = "2.56.2"
 hiltNavigationCompose = "1.2.0"
 hiltWork = "1.2.0"
-glance = "1.1.1"
+glance = "1.2.0-rc01"
 kotlinxSerializationJson = "1.7.3"
 
 [libraries]
