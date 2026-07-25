@@ -61,6 +61,9 @@ class ChatViewModel @Inject constructor(
 
     val modelState: StateFlow<ModelReadyState> = modelLifecycle.state
 
+    /** The backend the model actually loaded on ("GPU" or "CPU") — surfaced for UX transparency. */
+    fun getActiveBackend(): String = modelLifecycle.getActiveBackend()
+
     private val _uiState = MutableStateFlow(ChatUiState())
     val uiState: StateFlow<ChatUiState> = _uiState.asStateFlow()
 

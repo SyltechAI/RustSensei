@@ -545,7 +545,7 @@ private fun SessionCompleteScreen(
 
         OutlinedButton(
             onClick = onNavigateBack,
-            shape = RoundedCornerShape(10.dp),
+            shape = RoundedCornerShape(12.dp),
             border = androidx.compose.foundation.BorderStroke(1.dp, AppColors.current.accent.copy(alpha = 0.5f)),
             colors = ButtonDefaults.outlinedButtonColors(
                 contentColor = AppColors.current.accent

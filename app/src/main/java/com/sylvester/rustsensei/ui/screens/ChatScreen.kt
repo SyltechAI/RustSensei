@@ -305,9 +305,10 @@ fun ChatScreen(
 
                 if (modelState == ModelReadyState.READY && uiState.messages.isEmpty() && !uiState.isGenerating) {
                     item(key = "welcome") {
-                        WelcomeState(onPromptSelected = { prompt ->
-                            inputText = prompt
-                        })
+                        WelcomeState(
+                            backend = viewModel.getActiveBackend(),
+                            onPromptSelected = { prompt -> inputText = prompt }
+                        )
                     }
                 }
 
@@ -512,7 +513,7 @@ private fun ChatModeSelector(
  * Displays a crab avatar, intro text, privacy badge, and quick-prompt suggestion buttons.
  */
 @Composable
-private fun WelcomeState(onPromptSelected: (String) -> Unit) {
+private fun WelcomeState(backend: String, onPromptSelected: (String) -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -543,9 +544,13 @@ private fun WelcomeState(onPromptSelected: (String) -> Unit) {
 
         Spacer(modifier = Modifier.height(6.dp))
 
-        // Privacy badge -- labelSmall mono, primary at 50%
+        // Privacy + backend badge -- labelSmall mono, primary at 50%
         Text(
-            text = "Offline \u00B7 Private \u00B7 On-device AI",
+            text = when (backend) {
+                "GPU" -> "Offline \u00B7 Private \u00B7 GPU-accelerated"
+                "CPU" -> "Offline \u00B7 Private \u00B7 CPU (slower)"
+                else -> "Offline \u00B7 Private \u00B7 On-device AI"
+            },
             style = MaterialTheme.typography.labelSmall,
             fontFamily = FontFamily.Monospace,
             color = MaterialTheme.colorScheme.primary.copy(alpha = Alpha.HINT),
@@ -565,11 +570,11 @@ private fun WelcomeState(onPromptSelected: (String) -> Unit) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 5.dp)
-                    .clip(RoundedCornerShape(10.dp))
+                    .clip(RoundedCornerShape(12.dp))
                     .border(
                         width = 1.dp,
                         color = MaterialTheme.colorScheme.primary.copy(alpha = Alpha.BORDER),
-                        shape = RoundedCornerShape(10.dp)
+                        shape = RoundedCornerShape(12.dp)
                     )
                     .background(MaterialTheme.colorScheme.surfaceContainer)
                     .clickable { onPromptSelected(suggestion) }
