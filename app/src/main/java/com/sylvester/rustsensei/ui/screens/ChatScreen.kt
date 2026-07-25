@@ -273,6 +273,14 @@ fun ChatScreen(
                             )
                         }
                     }
+                    is ChatContext.CodeError -> {
+                        item(key = "context_banner") {
+                            ContextBanner(
+                                text = "Debugging your Playground code",
+                                onDismiss = { viewModel.clearChatContext() }
+                            )
+                        }
+                    }
                     is ChatContext.General -> { /* no banner for general context */ }
                 }
 

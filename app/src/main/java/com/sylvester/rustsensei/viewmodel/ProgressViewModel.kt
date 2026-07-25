@@ -1,6 +1,14 @@
 package com.sylvester.rustsensei.viewmodel
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.MenuBook
+import androidx.compose.material.icons.filled.LocalFireDepartment
+import androidx.compose.material.icons.filled.Psychology
+import androidx.compose.material.icons.filled.RocketLaunch
+import androidx.compose.material.icons.filled.Shield
+import androidx.compose.material.icons.filled.WorkspacePremium
 import androidx.compose.runtime.Immutable
+import androidx.compose.ui.graphics.vector.ImageVector
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -26,7 +34,7 @@ data class Achievement(
     val id: String,
     val title: String,
     val description: String,
-    val icon: String,
+    val icon: ImageVector,
     val isUnlocked: Boolean
 )
 
@@ -175,42 +183,42 @@ class ProgressViewModel @Inject constructor(
                         id = "first_steps",
                         title = "First Steps",
                         description = "Complete your first section",
-                        icon = "\uD83D\uDE80",
+                        icon = Icons.Filled.RocketLaunch,
                         isUnlocked = completedSections >= 1
                     ),
                     Achievement(
                         id = "borrow_checker_survivor",
                         title = "Borrow Checker Survivor",
                         description = "Complete all ownership exercises",
-                        icon = "\uD83D\uDEE1\uFE0F",
+                        icon = Icons.Filled.Shield,
                         isUnlocked = moveSemanticsDone >= 5
                     ),
                     Achievement(
                         id = "streak_master",
                         title = "Streak Master",
                         description = "Maintain a 7-day streak",
-                        icon = "\uD83D\uDD25",
+                        icon = Icons.Filled.LocalFireDepartment,
                         isUnlocked = state.studyStreak >= 7
                     ),
                     Achievement(
                         id = "century",
                         title = "Century",
                         description = "Complete 100 exercises",
-                        icon = "\uD83D\uDCAF",
+                        icon = Icons.Filled.WorkspacePremium,
                         isUnlocked = completedExercises >= 100
                     ),
                     Achievement(
                         id = "bookworm",
                         title = "Bookworm",
                         description = "Read 10 sections",
-                        icon = "\uD83D\uDCDA",
+                        icon = Icons.AutoMirrored.Filled.MenuBook,
                         isUnlocked = completedSections >= 10
                     ),
                     Achievement(
                         id = "quiz_whiz",
                         title = "Quiz Whiz",
                         description = "Score 100% on any quiz",
-                        icon = "\uD83E\uDDE0",
+                        icon = Icons.Filled.Psychology,
                         isUnlocked = hasPerfectQuiz
                     )
                 )

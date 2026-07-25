@@ -28,6 +28,7 @@ sealed class ChatContext {
     data object General : ChatContext()
     data class BookSection(val sectionId: String, val content: String) : ChatContext()
     data class Exercise(val exerciseId: String, val description: String, val userCode: String) : ChatContext()
+    data class CodeError(val code: String, val output: String) : ChatContext()
 }
 
 @Immutable

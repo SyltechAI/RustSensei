@@ -25,6 +25,7 @@ import com.sylvester.rustsensei.ui.screens.LearningPathScreen
 import com.sylvester.rustsensei.ui.screens.MainScreen
 import com.sylvester.rustsensei.ui.screens.ModelSetupScreen
 import com.sylvester.rustsensei.ui.screens.PlaygroundScreen
+import com.sylvester.rustsensei.viewmodel.ChatContext
 import com.sylvester.rustsensei.ui.screens.ProjectScreen
 import com.sylvester.rustsensei.ui.screens.RefactoringScreen
 import com.sylvester.rustsensei.ui.screens.VisualizerScreen
@@ -176,7 +177,12 @@ fun RustSenseiApp(
         composable<PlaygroundRoute> {
             PlaygroundScreen(
                 viewModel = playgroundViewModel,
-                onNavigateBack = { navController.popBackStack() }
+                onNavigateBack = { navController.popBackStack() },
+                onAskSensei = { code, output ->
+                    chatViewModel.setChatContext(ChatContext.CodeError(code, output))
+                    learningPathViewModel.requestTabNavigation("chat")
+                    navController.popBackStack()
+                }
             )
         }
 

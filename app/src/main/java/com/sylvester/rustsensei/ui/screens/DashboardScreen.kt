@@ -81,6 +81,7 @@ import com.sylvester.rustsensei.ui.components.ActivityChart
 import com.sylvester.rustsensei.ui.components.ConfettiOverlay
 import com.sylvester.rustsensei.ui.components.ProgressRing
 import com.sylvester.rustsensei.ui.components.SpecHeader
+import com.sylvester.rustsensei.ui.components.SpecLabel
 import com.sylvester.rustsensei.ui.components.SkeletonBox
 import com.sylvester.rustsensei.ui.theme.Alpha
 import com.sylvester.rustsensei.ui.theme.Dimens
@@ -245,6 +246,43 @@ fun DashboardScreen(
                                 )
                             }
                         }
+                    }
+                }
+            }
+        }
+
+        // =====================================================
+        // Section 1.6: Next Best Action (returning users)
+        // =====================================================
+        if (!isNewUser) {
+            item(key = "next_action") {
+                val readRatio = if (uiState.totalSections > 0)
+                    uiState.completedSections.toFloat() / uiState.totalSections else 1f
+                val practiceRatio = if (uiState.totalExercises > 0)
+                    uiState.completedExercises.toFloat() / uiState.totalExercises else 1f
+                val quizRatio = if (uiState.totalQuizzes > 0)
+                    uiState.completedQuizzes.toFloat() / uiState.totalQuizzes else 1f
+                val minRatio = minOf(readRatio, practiceRatio, quizRatio)
+                if (minRatio < 1f) {
+                    when (minRatio) {
+                        practiceRatio -> NextBestAction(
+                            title = "Practice what you've learned",
+                            detail = "Reinforce it with hands-on exercises",
+                            icon = Icons.Filled.Code,
+                            onClick = onNavigateToExercises
+                        )
+                        quizRatio -> NextBestAction(
+                            title = "Test your knowledge",
+                            detail = "Take a quiz to see what stuck",
+                            icon = Icons.Filled.Quiz,
+                            onClick = onNavigateToQuiz
+                        )
+                        else -> NextBestAction(
+                            title = "Keep reading",
+                            detail = "Continue through the Rust book",
+                            icon = Icons.AutoMirrored.Filled.MenuBook,
+                            onClick = onNavigateToLearn
+                        )
                     }
                 }
             }
@@ -944,10 +982,14 @@ private fun AchievementBadge(achievement: Achievement) {
             .padding(10.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = achievement.icon,
-            fontSize = 28.sp,
-            modifier = Modifier.padding(bottom = 6.dp)
+        Icon(
+            imageVector = achievement.icon,
+            contentDescription = null,
+            tint = if (achievement.isUnlocked) MaterialTheme.colorScheme.primary
+                   else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = contentAlpha),
+            modifier = Modifier
+                .size(30.dp)
+                .padding(bottom = 6.dp)
         )
         Text(
             text = achievement.title,
@@ -959,6 +1001,60 @@ private fun AchievementBadge(achievement: Achievement) {
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = contentAlpha),
             lineHeight = 14.sp
         )
+    }
+}
+
+@Composable
+private fun NextBestAction(
+    title: String,
+    detail: String,
+    icon: ImageVector,
+    onClick: () -> Unit
+) {
+    Column(modifier = Modifier.fillMaxWidth().padding(top = 20.dp)) {
+        SpecLabel("Next best action")
+        Spacer(modifier = Modifier.height(8.dp))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .border(
+                    1.dp,
+                    MaterialTheme.colorScheme.primary.copy(alpha = Alpha.BORDER),
+                    RoundedCornerShape(12.dp)
+                )
+                .background(MaterialTheme.colorScheme.surfaceContainer)
+                .clickable { onClick() }
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(24.dp)
+            )
+            Spacer(modifier = Modifier.width(14.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = detail,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            Text(
+                text = ">",
+                fontFamily = FontFamily.Monospace,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
     }
 }
 

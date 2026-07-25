@@ -60,7 +60,8 @@ import com.sylvester.rustsensei.ui.theme.AppColors
 @Composable
 fun PlaygroundScreen(
     viewModel: PlaygroundViewModel,
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    onAskSensei: (code: String, output: String) -> Unit = { _, _ -> }
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val modelState by viewModel.modelState.collectAsState()
@@ -339,6 +340,32 @@ fun PlaygroundScreen(
                         style = MaterialTheme.typography.labelSmall,
                         fontFamily = FontFamily.Monospace,
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = Alpha.SECONDARY)
+                    )
+                }
+            }
+
+            // Ask Sensei — hand the code + compiler error to the tutor
+            if (uiState.errorMessage != null ||
+                (uiState.outputSource == OutputSource.COMPILATION && uiState.compilationSuccess == false)
+            ) {
+                Spacer(modifier = Modifier.height(Spacing.MD))
+                OutlinedButton(
+                    onClick = {
+                        onAskSensei(uiState.code, uiState.errorMessage ?: uiState.output)
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(Dimens.ButtonHeight),
+                    shape = RoundedCornerShape(Dimens.CardRadius),
+                    border = BorderStroke(
+                        Dimens.Divider,
+                        AppColors.current.accent.copy(alpha = Alpha.MUTED)
+                    )
+                ) {
+                    Text(
+                        text = "Ask Sensei about this error",
+                        color = AppColors.current.accent,
+                        fontWeight = FontWeight.SemiBold
                     )
                 }
             }

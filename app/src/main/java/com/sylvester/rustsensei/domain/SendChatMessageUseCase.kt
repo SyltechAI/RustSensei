@@ -96,6 +96,17 @@ class SendChatMessageUseCase @Inject constructor(
                 appendLine(context.userCode)
                 appendLine("```")
             }
+            is ChatContext.CodeError -> buildString {
+                appendLine("The student ran this Rust code in the playground and hit an error.")
+                appendLine("\nCode:")
+                appendLine("```rust")
+                appendLine(context.code)
+                appendLine("```")
+                appendLine("\nCompiler output:")
+                appendLine("```")
+                appendLine(context.output)
+                appendLine("```")
+            }
         }
 }
 

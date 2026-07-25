@@ -153,6 +153,7 @@ fun MainScreen(
         when (tab) {
             "learn" -> tabNavController.navigateToTab(Tab.Learn)
             "practice" -> tabNavController.navigateToTab(Tab.Practice)
+            "chat" -> tabNavController.navigateToTab(Tab.Chat)
         }
         learningPathViewModel.clearTabRequest()
     }
