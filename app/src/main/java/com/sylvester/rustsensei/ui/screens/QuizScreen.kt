@@ -83,6 +83,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sylvester.rustsensei.data.QuizQuestion
 import com.sylvester.rustsensei.ui.components.ConfettiOverlay
+import com.sylvester.rustsensei.ui.components.SenseiMark
 import com.sylvester.rustsensei.ui.components.SpecHeader
 import com.sylvester.rustsensei.ui.theme.AppColors
 import com.sylvester.rustsensei.ui.theme.DarkSurfaceContainer
@@ -789,14 +790,6 @@ private fun QuizCompleteView(
         else -> "Review and try again"
     }
 
-    val emoji = when {
-        percent == 100 -> "\uD83C\uDF1F"  // star
-        percent >= 80 -> "\uD83C\uDF89"   // party
-        percent >= 60 -> "\uD83D\uDCAA"   // muscle
-        percent >= 40 -> "\uD83D\uDCDA"   // books
-        else -> "\uD83E\uDD14"            // thinking
-    }
-
     Box(modifier = Modifier.fillMaxSize()) {
     Column(
         modifier = Modifier
@@ -808,8 +801,8 @@ private fun QuizCompleteView(
     ) {
         Spacer(modifier = Modifier.weight(0.15f))
 
-        // Emoji
-        Text(text = emoji, fontSize = 56.sp)
+        // RustSensei mark
+        SenseiMark(size = 56.dp)
 
         Spacer(modifier = Modifier.height(16.dp))
 

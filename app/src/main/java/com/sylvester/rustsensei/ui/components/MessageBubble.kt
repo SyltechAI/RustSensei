@@ -108,11 +108,10 @@ fun MessageBubble(
             horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.Top
         ) {
-            // Crab emoji indicator for first message in a group
+            // RustSensei mark for the first message in a group
             if (isFirstInGroup) {
-                Text(
-                    text = "\uD83E\uDD80",
-                    fontSize = 18.sp,
+                SenseiMark(
+                    size = 20.dp,
                     modifier = Modifier.padding(end = 6.dp, top = 4.dp)
                 )
             }
