@@ -110,11 +110,6 @@ class RustSenseiWidget : GlanceAppWidget() {
                 modifier = GlanceModifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "\uD83D\uDD25",
-                    style = TextStyle(fontSize = 20.sp)
-                )
-                Spacer(modifier = GlanceModifier.width(8.dp))
                 Column {
                     Text(
                         text = "${data.streakDays}",
