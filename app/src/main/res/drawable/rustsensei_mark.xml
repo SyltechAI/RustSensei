@@ -1,0 +1,18 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="100dp"
+    android:height="100dp"
+    android:viewportWidth="100"
+    android:viewportHeight="100">
+    <!-- Prompt chevron: the RustSensei mark (matches the launcher icon). -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M30,22 L66,50 L30,78"
+        android:strokeColor="#FF5C00"
+        android:strokeWidth="13"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <!-- Amber node. -->
+    <path
+        android:fillColor="#FFA566"
+        android:pathData="M78,26 m-8,0 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0" />
+</vector>
