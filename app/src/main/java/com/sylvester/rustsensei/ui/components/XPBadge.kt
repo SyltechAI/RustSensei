@@ -50,11 +50,8 @@ fun XPBadge(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
-            // Crab emoji
-            Text(
-                text = "\uD83E\uDD80",
-                fontSize = 16.sp
-            )
+            // RustSensei mark
+            SenseiMark(size = 16.dp)
 
             Spacer(modifier = Modifier.width(6.dp))
 

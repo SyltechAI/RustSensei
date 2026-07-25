@@ -14,6 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import com.sylvester.rustsensei.data.PreferencesManager
 import com.sylvester.rustsensei.data.ThemePreference
+import com.sylvester.rustsensei.ui.components.AppWithSplash
 import com.sylvester.rustsensei.ui.theme.RustSenseiTheme
 import com.sylvester.rustsensei.work.ReminderScheduler
 import dagger.hilt.android.AndroidEntryPoint
@@ -29,6 +30,8 @@ class MainActivity : ComponentActivity() {
     val themePreference = MutableStateFlow(ThemePreference.SYSTEM)
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Brief system splash (Ink + mark) hands off to the full-screen brand
+        // splash drawn in Compose (AppWithSplash), which carries the branding.
         installSplashScreen()
         super.onCreate(savedInstanceState)
         themePreference.value = ThemePreference.fromString(preferencesManager.getThemePreference())
@@ -46,10 +49,12 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    RustSenseiApp(
-                        preferencesManager = preferencesManager,
-                        reminderScheduler = reminderScheduler
-                    )
+                    AppWithSplash {
+                        RustSenseiApp(
+                            preferencesManager = preferencesManager,
+                            reminderScheduler = reminderScheduler
+                        )
+                    }
                 }
             }
         }

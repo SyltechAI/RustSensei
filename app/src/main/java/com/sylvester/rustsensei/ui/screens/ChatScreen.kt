@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -44,7 +46,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
@@ -57,6 +58,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -76,6 +78,7 @@ import com.sylvester.rustsensei.ui.theme.SecondaryText
 import com.sylvester.rustsensei.ui.theme.Spacing
 import com.sylvester.rustsensei.ui.components.InputBar
 import com.sylvester.rustsensei.ui.components.MessageBubble
+import com.sylvester.rustsensei.ui.components.SenseiMark
 import com.sylvester.rustsensei.ui.components.StreamingIndicator
 import com.sylvester.rustsensei.viewmodel.ChatContext
 import com.sylvester.rustsensei.viewmodel.ChatViewModel
@@ -183,7 +186,7 @@ fun ChatScreen(
                     )
                 }
                 Text(
-                    text = "Rust Sensei",
+                    text = "RustSensei",
                     style = MaterialTheme.typography.titleMedium,
                     fontFamily = FontFamily.Monospace,
                     fontWeight = FontWeight.SemiBold,
@@ -257,7 +260,7 @@ fun ChatScreen(
                     is ChatContext.BookSection -> {
                         item(key = "context_banner") {
                             ContextBanner(
-                                text = "\uD83D\uDCD6 Answering with context from: ${ctx.sectionId}",
+                                text = "Answering with context from: ${ctx.sectionId}",
                                 onDismiss = { viewModel.clearChatContext() }
                             )
                         }
@@ -265,7 +268,15 @@ fun ChatScreen(
                     is ChatContext.Exercise -> {
                         item(key = "context_banner") {
                             ContextBanner(
-                                text = "\uD83D\uDCBB Helping with exercise: ${ctx.exerciseId}",
+                                text = "Helping with exercise: ${ctx.exerciseId}",
+                                onDismiss = { viewModel.clearChatContext() }
+                            )
+                        }
+                    }
+                    is ChatContext.CodeError -> {
+                        item(key = "context_banner") {
+                            ContextBanner(
+                                text = "Debugging your Playground code",
                                 onDismiss = { viewModel.clearChatContext() }
                             )
                         }
@@ -466,12 +477,6 @@ private fun ChatModeSelector(
                 ChatMode.SOCRATIC -> stringResource(R.string.chat_mode_socratic)
                 ChatMode.RUBBER_DUCK -> stringResource(R.string.chat_mode_rubber_duck)
             }
-            val icon = when (mode) {
-                ChatMode.DIRECT -> "\uD83D\uDCAC"
-                ChatMode.SOCRATIC -> "\uD83E\uDDE0"
-                ChatMode.RUBBER_DUCK -> "\uD83E\uDD86"
-            }
-
             Surface(
                 onClick = { onModeSelected(mode) },
                 shape = RoundedCornerShape(Spacing.SM),
@@ -484,20 +489,19 @@ private fun ChatModeSelector(
                 ),
                 modifier = Modifier.weight(1f)
             ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.padding(vertical = Spacing.SM, horizontal = Spacing.XS)
-                ) {
-                    Text(text = icon, fontSize = 16.sp)
-                    Spacer(modifier = Modifier.height(Spacing.XXS))
-                    Text(
-                        text = label,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = if (isSelected) AppColors.current.accent else MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                        maxLines = 1
-                    )
-                }
+                Text(
+                    text = label.uppercase(),
+                    style = MaterialTheme.typography.labelSmall,
+                    fontFamily = FontFamily.Monospace,
+                    letterSpacing = 0.5.sp,
+                    color = if (isSelected) AppColors.current.accent else MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                    maxLines = 1,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = Spacing.MD, horizontal = Spacing.XS)
+                )
             }
         }
     }
@@ -515,11 +519,8 @@ private fun WelcomeState(onPromptSelected: (String) -> Unit) {
             .padding(top = 48.dp, bottom = 24.dp, start = 24.dp, end = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // 56sp crab emoji avatar — larger for visual weight
-        Text(
-            text = "\uD83E\uDD80",
-            fontSize = Dimens.AvatarEmoji
-        )
+        // RustSensei chevron mark — brand avatar (replaces the former Ferris emoji)
+        SenseiMark(size = 72.dp)
 
         Spacer(modifier = Modifier.height(20.dp))
 
@@ -560,21 +561,29 @@ private fun WelcomeState(onPromptSelected: (String) -> Unit) {
             "What's the Rust equivalent of a Python dict?"
         )
         suggestions.forEach { suggestion ->
-            OutlinedButton(
-                onClick = { onPromptSelected(suggestion) },
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 4.dp),
-                shape = RoundedCornerShape(12.dp),
-                border = BorderStroke(
-                    width = 1.dp,
-                    color = MaterialTheme.colorScheme.primary.copy(alpha = Alpha.DIVIDER)
-                ),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainer
-                ),
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 14.dp)
+                    .padding(vertical = 5.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .border(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = Alpha.BORDER),
+                        shape = RoundedCornerShape(10.dp)
+                    )
+                    .background(MaterialTheme.colorScheme.surfaceContainer)
+                    .clickable { onPromptSelected(suggestion) }
+                    .padding(horizontal = 14.dp, vertical = 13.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
+                Text(
+                    text = ">",
+                    fontFamily = FontFamily.Monospace,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontSize = 14.sp
+                )
+                Spacer(modifier = Modifier.width(10.dp))
                 Text(
                     text = suggestion,
                     style = MaterialTheme.typography.bodyMedium,
@@ -598,7 +607,7 @@ private fun NoModelState(onDownload: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Crab emoji — larger for visual weight
-        Text(text = "\uD83E\uDD80", fontSize = Dimens.AvatarEmoji)
+        SenseiMark(size = 72.dp)
 
         Spacer(modifier = Modifier.height(20.dp))
 
@@ -667,7 +676,7 @@ private fun ModelLoadingState() {
             .padding(top = 48.dp, bottom = 24.dp, start = 24.dp, end = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "\uD83E\uDD80", fontSize = Dimens.AvatarEmoji)
+        SenseiMark(size = 72.dp)
         Spacer(modifier = Modifier.height(20.dp))
         Text(
             text = stringResource(R.string.loading_tutor),
@@ -699,7 +708,7 @@ private fun ModelErrorState(onRetry: () -> Unit) {
             .padding(top = 48.dp, bottom = 24.dp, start = 24.dp, end = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "\uD83E\uDD80", fontSize = Dimens.AvatarEmoji)
+        SenseiMark(size = 72.dp)
         Spacer(modifier = Modifier.height(20.dp))
         Text(
             text = stringResource(R.string.failed_load_model),

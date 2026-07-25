@@ -61,6 +61,8 @@ import androidx.compose.ui.unit.sp
 import com.sylvester.rustsensei.llm.ModelInfo
 import com.sylvester.rustsensei.llm.ModelManager
 import com.sylvester.rustsensei.ui.components.MemoryWarningDialog
+import com.sylvester.rustsensei.ui.components.SenseiMark
+import com.sylvester.rustsensei.ui.components.SpecLabel
 import com.sylvester.rustsensei.ui.components.isMemoryLow
 import com.sylvester.rustsensei.viewmodel.ModelState
 import com.sylvester.rustsensei.viewmodel.ModelViewModel
@@ -105,7 +107,15 @@ fun ModelSetupScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Download AI Model") },
+                title = {
+                    Column {
+                        SpecLabel("RustSensei / Setup")
+                        Text(
+                            "Download AI Model",
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                    }
+                },
                 navigationIcon = {
                     IconButton(onClick = onSkip) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -127,8 +137,8 @@ fun ModelSetupScreen(
     ) {
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Logo area — dramatic 80sp crab
-        Text(text = "\uD83E\uDD80", fontSize = 80.sp)
+        // Logo area — RustSensei mark
+        SenseiMark(size = 80.dp)
         Spacer(modifier = Modifier.height(16.dp))
 
         // Subtitle — enable chat with your tutor

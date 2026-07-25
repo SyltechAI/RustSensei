@@ -39,6 +39,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.sylvester.rustsensei.R
+import com.sylvester.rustsensei.ui.components.SpecLabel
 import com.sylvester.rustsensei.ui.theme.Alpha
 import com.sylvester.rustsensei.ui.theme.Dimens
 import com.sylvester.rustsensei.ui.theme.Spacing
@@ -57,11 +58,15 @@ fun DailyChallengeScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        text = stringResource(R.string.daily_challenge_title),
-                        fontFamily = FontFamily.Monospace,
-                        fontWeight = FontWeight.Bold
-                    )
+                    Column {
+                        SpecLabel("RustSensei / Daily Challenge")
+                        Text(
+                            text = stringResource(R.string.daily_challenge_title),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontFamily = FontFamily.Monospace,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {

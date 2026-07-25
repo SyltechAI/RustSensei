@@ -65,6 +65,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sylvester.rustsensei.data.LearningPath
+import com.sylvester.rustsensei.ui.components.SpecLabel
 import com.sylvester.rustsensei.data.PathStep
 import com.sylvester.rustsensei.ui.theme.Alpha
 import com.sylvester.rustsensei.ui.theme.Dimens
@@ -103,13 +104,16 @@ fun LearningPathScreen(
             Column {
                 TopAppBar(
                     title = {
-                        Text(
-                            text = if (uiState.mode == PathMode.DETAIL)
-                                uiState.selectedPath?.title ?: "Learning Path"
-                            else "Learning Paths",
-                            fontWeight = FontWeight.Bold,
-                            style = MaterialTheme.typography.headlineSmall
-                        )
+                        Column {
+                            SpecLabel("RustSensei / Learning Paths")
+                            Text(
+                                text = if (uiState.mode == PathMode.DETAIL)
+                                    uiState.selectedPath?.title ?: "Learning Path"
+                                else "Learning Paths",
+                                fontWeight = FontWeight.Bold,
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                        }
                     },
                     navigationIcon = {
                         IconButton(onClick = {

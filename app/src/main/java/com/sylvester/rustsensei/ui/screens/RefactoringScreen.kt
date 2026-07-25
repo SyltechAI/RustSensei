@@ -67,6 +67,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.sp
 import com.sylvester.rustsensei.R
+import com.sylvester.rustsensei.ui.components.SpecLabel
 import com.sylvester.rustsensei.ui.components.CodeBlock
 import com.sylvester.rustsensei.ui.components.CodeEditor
 import com.sylvester.rustsensei.ui.components.UndoRedoManager
@@ -101,11 +102,15 @@ fun RefactoringScreen(
             topBar = {
                 TopAppBar(
                     title = {
-                        Text(
-                            text = stringResource(R.string.refactoring_title),
-                            fontFamily = FontFamily.Monospace,
-                            fontWeight = FontWeight.Bold
-                        )
+                        Column {
+                            SpecLabel("RustSensei / Refactor")
+                            Text(
+                                text = stringResource(R.string.refactoring_title),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontFamily = FontFamily.Monospace,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
                     },
                     navigationIcon = {
                         IconButton(onClick = onNavigateBack) {

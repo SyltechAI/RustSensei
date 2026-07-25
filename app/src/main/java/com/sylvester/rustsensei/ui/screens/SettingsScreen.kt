@@ -57,6 +57,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import com.sylvester.rustsensei.ui.components.SpecLabel
 import com.sylvester.rustsensei.ui.util.toggleFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -101,6 +102,8 @@ fun SettingsScreen(
             .padding(Dimens.ScreenPadding)
         ) {
             // ── Screen Title ──
+            SpecLabel("RustSensei / Settings")
+            Spacer(modifier = Modifier.height(Spacing.XXS))
             Text(
                 text = "Settings",
                 style = MaterialTheme.typography.headlineMedium,

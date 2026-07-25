@@ -49,14 +49,14 @@ import kotlinx.coroutines.launch
 // ── Neon Terminal code block colors ──────────────────────────────────
 
 // Rust syntax highlighting — tuned for dark neon background
-internal val KeywordColor = Color(0xFFCC7832)      // orange - keywords
-internal val StringColor = Color(0xFF6A8759)        // green - strings
-internal val CommentColor = Color(0xFF5C6370)       // muted gray - comments
-internal val TypeColor = Color(0xFF4DEEEA)          // neon cyan - types
-internal val NumberColor = Color(0xFFB5CEA8)        // light green - numbers
-internal val MacroColor = Color(0xFFD4D4AA)         // yellow - macros
-internal val FunctionColor = Color(0xFFDCDCAA)      // light yellow - functions
-internal val DefaultCodeColor = Color(0xFFD4D4D4)   // light gray - default
+internal val KeywordColor = Color(0xFFFF5C00)      // Signal Orange - keywords
+internal val StringColor = Color(0xFF8FB573)        // sage green - strings
+internal val CommentColor = Color(0xFF7A7A82)       // muted ash - comments
+internal val TypeColor = Color(0xFFFFA566)          // Amber - types
+internal val NumberColor = Color(0xFFC9A06B)        // warm tan - numbers
+internal val MacroColor = Color(0xFFFF7A2E)         // Signal Bright - macros
+internal val FunctionColor = Color(0xFFE8B27E)      // soft amber - functions
+internal val DefaultCodeColor = Color(0xFFCFCFD4)   // Mist - default
 
 // Legacy alias — used by CodeEditor.kt's non-Composable RustSyntaxTransformation
 internal val CodeBgColor = Color(0xFF06080C)
