@@ -59,6 +59,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sylvester.rustsensei.R
+import com.sylvester.rustsensei.ui.components.SpecLabel
 import com.sylvester.rustsensei.ui.components.CodeBlock
 import com.sylvester.rustsensei.ui.components.CodeEditor
 import com.sylvester.rustsensei.ui.components.ConfettiOverlay
@@ -155,9 +156,10 @@ internal fun ExerciseDetailView(
                 )
             }
             Column(modifier = Modifier.weight(1f)) {
+                SpecLabel("Exercise")
                 Text(
                     text = exercise.title,
-                    style = MaterialTheme.typography.titleLarge,
+                    style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
                 )

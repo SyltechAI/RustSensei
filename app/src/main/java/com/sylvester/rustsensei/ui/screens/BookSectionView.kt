@@ -57,6 +57,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sylvester.rustsensei.ui.components.BookContentRenderer
+import com.sylvester.rustsensei.ui.components.SpecLabel
 import com.sylvester.rustsensei.ui.components.CodeBlock
 import com.sylvester.rustsensei.ui.theme.Alpha
 import com.sylvester.rustsensei.ui.theme.Dimens
@@ -163,14 +164,16 @@ internal fun BookSectionView(
             ) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
             }
-            Text(
-                text = uiState.currentChapter?.title ?: section.title,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.weight(1f),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
+            Column(modifier = Modifier.weight(1f)) {
+                SpecLabel("Section")
+                Text(
+                    text = uiState.currentChapter?.title ?: section.title,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
             val isBookmarked = uiState.sectionProgress[section.id]?.bookmarked == true
             IconButton(
                 onClick = { viewModel.toggleBookmark() },

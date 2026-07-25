@@ -51,6 +51,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
 import com.sylvester.rustsensei.R
+import com.sylvester.rustsensei.ui.components.SpecLabel
 import com.sylvester.rustsensei.content.DocEntry
 import com.sylvester.rustsensei.content.DocIndexEntry
 import com.sylvester.rustsensei.content.DocMethod
@@ -77,12 +78,16 @@ fun DocsScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        text = uiState.currentDoc?.typeName
-                            ?: stringResource(R.string.docs_title),
-                        fontFamily = FontFamily.Monospace,
-                        fontWeight = FontWeight.Bold
-                    )
+                    Column {
+                        SpecLabel("RustSensei / Docs")
+                        Text(
+                            text = uiState.currentDoc?.typeName
+                                ?: stringResource(R.string.docs_title),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontFamily = FontFamily.Monospace,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 },
                 navigationIcon = {
                     IconButton(

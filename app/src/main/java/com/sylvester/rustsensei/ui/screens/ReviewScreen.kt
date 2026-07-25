@@ -64,6 +64,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sylvester.rustsensei.ui.components.ConfettiOverlay
+import com.sylvester.rustsensei.ui.components.SpecLabel
 import com.sylvester.rustsensei.ui.theme.DarkSurfaceContainerHigh
 import com.sylvester.rustsensei.viewmodel.ReviewViewModel
 import com.sylvester.rustsensei.ui.theme.AppColors
@@ -93,11 +94,14 @@ fun ReviewScreen(
             Column {
                 TopAppBar(
                     title = {
-                        Text(
-                            "Review",
-                            fontWeight = FontWeight.Bold,
-                            style = MaterialTheme.typography.titleLarge
-                        )
+                        Column {
+                            SpecLabel("RustSensei / Review")
+                            Text(
+                                "Review",
+                                fontWeight = FontWeight.Bold,
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                        }
                     },
                     navigationIcon = {
                         IconButton(onClick = onNavigateBack) {

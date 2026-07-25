@@ -57,6 +57,7 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sylvester.rustsensei.R
+import com.sylvester.rustsensei.ui.components.SpecLabel
 import com.sylvester.rustsensei.content.AllocationStatus
 import com.sylvester.rustsensei.content.HeapAllocation
 import com.sylvester.rustsensei.content.OwnershipScenario
@@ -81,13 +82,17 @@ fun VisualizerScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        text = if (uiState.currentScenario != null)
-                            uiState.currentScenario!!.title
-                        else stringResource(R.string.visualizer_title),
-                        fontFamily = FontFamily.Monospace,
-                        fontWeight = FontWeight.Bold
-                    )
+                    Column {
+                        SpecLabel("RustSensei / Visualizer")
+                        Text(
+                            text = if (uiState.currentScenario != null)
+                                uiState.currentScenario!!.title
+                            else stringResource(R.string.visualizer_title),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontFamily = FontFamily.Monospace,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 },
                 navigationIcon = {
                     IconButton(onClick = {
