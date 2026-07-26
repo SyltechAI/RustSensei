@@ -133,14 +133,6 @@ fun ChatScreen(
         }
     }
 
-    // Start a new conversation ONLY if none has ever been created.
-    val convId = uiState.currentConversationId
-    LaunchedEffect(convId) {
-        if (convId == null) {
-            viewModel.startNewConversation()
-        }
-    }
-
     ModalNavigationDrawer(
         drawerState = drawerState,
         gesturesEnabled = !inSheet,

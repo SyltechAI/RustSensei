@@ -113,20 +113,20 @@ class ChatViewModel @Inject constructor(
 
     // ── Conversation lifecycle ──────────────────────────────────────
 
+    /**
+     * Reset to a blank chat. The conversation row itself is created lazily on the
+     * first message (see [sendMessage]), so opening chat -- or tapping New -- and
+     * leaving without sending never leaves an empty conversation in history.
+     */
     fun startNewConversation() {
+        messagesJob?.cancel()
+        _uiState.value = ChatUiState()
+        _chatContext.value = ChatContext.General
         viewModelScope.launch {
             try {
-                messagesJob?.cancel()
                 engine.clearCache()
-                val convId = repository.createConversation()
-                _uiState.value = ChatUiState(currentConversationId = convId)
-                _chatContext.value = ChatContext.General
-                observeMessages(convId)
             } catch (e: Exception) {
-                Log.e(TAG, "Error in startNewConversation: ${e.message}", e)
-                _uiState.value = _uiState.value.copy(
-                    errorMessage = "Failed to create conversation. Please try again."
-                )
+                Log.e(TAG, "Error clearing cache on new conversation: ${e.message}", e)
             }
         }
     }
@@ -159,7 +159,6 @@ class ChatViewModel @Inject constructor(
     // ── Message sending (delegates to UseCase) ──────────────────────
 
     fun sendMessage(text: String) {
-        val convId = _uiState.value.currentConversationId ?: return
         val trimmed = text.trim()
         if (trimmed.isBlank()) return
         if (!sendingGate.compareAndSet(false, true)) return
@@ -179,6 +178,24 @@ class ChatViewModel @Inject constructor(
         )
 
         generationJob = viewModelScope.launch {
+            // Create the conversation lazily, on the first message, so an opened-
+            // but-unused chat never leaves an empty conversation in history and
+            // every later message stays in this same conversation.
+            val convId = _uiState.value.currentConversationId ?: try {
+                val newId = repository.createConversation()
+                _uiState.value = _uiState.value.copy(currentConversationId = newId)
+                observeMessages(newId)
+                newId
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to create conversation: ${e.message}", e)
+                _uiState.value = _uiState.value.copy(
+                    isGenerating = false,
+                    errorMessage = "Failed to start conversation. Please try again."
+                )
+                sendingGate.set(false)
+                return@launch
+            }
+
             sendChatMessage(convId, message, context, _config.value, chatMode = _chatMode.value)
                 .onCompletion {
                     sendingGate.set(false)
