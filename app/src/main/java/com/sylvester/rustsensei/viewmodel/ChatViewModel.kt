@@ -111,6 +111,15 @@ class ChatViewModel @Inject constructor(
         viewModelScope.launch { modelLifecycle.ensureLoaded() }
     }
 
+    /** Whether AI inference is pinned to CPU (Settings toggle). */
+    fun isRunOnCpu(): Boolean = prefsManager.isRunOnCpu()
+
+    /** Pin/unpin AI inference to CPU and reload the model on the new backend. */
+    fun setRunOnCpu(enabled: Boolean) {
+        prefsManager.setRunOnCpu(enabled)
+        viewModelScope.launch { modelLifecycle.reload() }
+    }
+
     // ── Conversation lifecycle ──────────────────────────────────────
 
     /**

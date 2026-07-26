@@ -27,6 +27,8 @@ class FakeModelLifecycle : ModelLifecycle {
     }
 
     override suspend fun unload() { _state.value = ModelReadyState.DOWNLOADED }
+
+    override suspend fun reload() { unload(); ensureLoaded() }
     override fun scheduleIdleUnload() {}
     override fun cancelIdleTimer() {}
     override fun refreshState() {}

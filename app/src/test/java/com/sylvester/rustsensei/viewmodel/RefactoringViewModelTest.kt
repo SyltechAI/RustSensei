@@ -262,6 +262,7 @@ class RefactoringViewModelTest {
         override val state: StateFlow<ModelReadyState> = MutableStateFlow(ModelReadyState.NOT_DOWNLOADED)
         override suspend fun ensureLoaded() = false
         override suspend fun unload() = Unit
+        override suspend fun reload() = Unit
         override fun scheduleIdleUnload() = Unit
         override fun cancelIdleTimer() = Unit
         override fun refreshState() = Unit

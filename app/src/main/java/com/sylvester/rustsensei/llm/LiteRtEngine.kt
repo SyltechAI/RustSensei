@@ -14,7 +14,12 @@ import com.google.ai.edge.litertlm.ExperimentalFlags
 import com.google.ai.edge.litertlm.Message
 import com.google.ai.edge.litertlm.MessageCallback
 import com.google.ai.edge.litertlm.SamplerConfig
+import com.sylvester.rustsensei.data.PreferencesManager
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -54,10 +59,27 @@ class LiteRtEngine(private val context: Context) : InferenceEngine {
 
     @Volatile private var activeBackend: String = "GPU"
 
+    // Remembered so we can transparently reload on CPU if the GPU turns out to
+    // produce zero tokens on this device.
+    @Volatile private var lastModelPath: String? = null
+    @Volatile private var lastContextSize: Int = 2048
+
+    // Set when the GPU initializes fine but emits zero tokens. Makes the rest of
+    // this session fall back to CPU. Deliberately NOT persisted: the failure is
+    // intermittent, so a fresh process retries the (usually much faster) GPU.
+    @Volatile private var gpuUnusableThisSession = false
+    private val reloadScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+    // User-facing "Run AI on CPU" setting (Settings screen). Read fresh on each
+    // load so toggling + reloading switches backends.
+    private val userPrefs by lazy { PreferencesManager(context) }
+
     override fun getActiveBackend(): String = activeBackend
 
     @OptIn(ExperimentalApi::class)
     override suspend fun loadModel(modelPath: String, contextSize: Int): Boolean {
+        lastModelPath = modelPath
+        lastContextSize = contextSize
         return withContext(Dispatchers.IO) {
             synchronized(lock) {
                 try {
@@ -74,8 +96,13 @@ class LiteRtEngine(private val context: Context) : InferenceEngine {
                     conversation = null
                     engine = null
 
-                    // Try GPU first (fast, Tensor/Adreno), fall back to CPU (universal)
+                    // Try GPU first (fast, Tensor/Adreno), fall back to CPU (universal).
+                    // Some GPUs (e.g. Pixel 6 / Tensor) initialize fine but intermittently
+                    // generate zero tokens; when that's seen (see onDone) we skip GPU for
+                    // the rest of this session and reload here on CPU.
                     val newEngine = try {
+                        if (userPrefs.isRunOnCpu()) throw RuntimeException("Run-on-CPU enabled in Settings")
+                        if (gpuUnusableThisSession) throw RuntimeException("GPU produced no tokens this session; using CPU")
                         val gpuConfig = EngineConfig(
                             modelPath = modelPath,
                             backend = Backend.GPU(),
@@ -200,6 +227,25 @@ class LiteRtEngine(private val context: Context) : InferenceEngine {
                                 onStats?.invoke(0f, tokPerSec, (ftTime - startTime).toFloat())
                             } catch (e: Exception) {
                                 Log.e(TAG, "Error in onDone stats: ${e.message}", e)
+                            }
+
+                            // GPU compatibility guard: some GPUs (notably Pixel 6 /
+                            // Google Tensor) initialize fine but intermittently generate
+                            // zero tokens. Detect that, fall back to CPU for this session,
+                            // tell the user to resend, and reload on CPU so it works.
+                            if (tokenCount == 0 && activeBackend == "GPU" && !gpuUnusableThisSession) {
+                                Log.w(TAG, "GPU produced 0 tokens — falling back to CPU for this session")
+                                gpuUnusableThisSession = true
+                                trySend(
+                                    "Your device's GPU had trouble running the on-device model, " +
+                                        "so RustSensei switched to CPU mode for now (a little slower, but reliable). " +
+                                        "Please send your message again."
+                                )
+                                lastModelPath?.let { path ->
+                                    // Small delay lets the native inference thread wind
+                                    // down before we close the engine to reload on CPU.
+                                    reloadScope.launch { delay(500); loadModel(path, lastContextSize) }
+                                }
                             }
                             close()
                         }

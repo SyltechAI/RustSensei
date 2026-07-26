@@ -105,6 +105,12 @@ class ModelLifecycleManager @Inject constructor(
         refreshState()
     }
 
+    /** Unload then load again — used when the backend preference changes. */
+    override suspend fun reload() {
+        unload()
+        ensureLoaded()
+    }
+
     override fun refreshState() {
         _state.value = resolveCurrentState()
     }
@@ -135,6 +141,7 @@ interface ModelLifecycle {
     val state: StateFlow<ModelReadyState>
     suspend fun ensureLoaded(): Boolean
     suspend fun unload()
+    suspend fun reload()
     fun scheduleIdleUnload()
     fun cancelIdleTimer()
     fun refreshState()

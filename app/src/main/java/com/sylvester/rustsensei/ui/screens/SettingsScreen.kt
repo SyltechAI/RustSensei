@@ -295,8 +295,9 @@ fun SettingsScreen(
                             fontFamily = FontFamily.Monospace,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
+                        var runOnCpu by remember { mutableStateOf(chatViewModel.isRunOnCpu()) }
                         val backend = modelViewModel.getActiveBackend()
-                        val backendLabel = if (backend == "GPU") "GPU-accelerated" else "CPU mode (slower)"
+                        val backendLabel = if (backend == "GPU" && !runOnCpu) "GPU-accelerated" else "CPU mode (slower)"
                         Text(
                             text = "Q8 | LiteRT | $backendLabel",
                             fontSize = 12.sp,
@@ -318,6 +319,43 @@ fun SettingsScreen(
                             fontFamily = FontFamily.Monospace,
                             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = Alpha.SOFT)
                         )
+
+                        // Run-on-CPU escape hatch for devices whose GPU is unreliable
+                        // for this model (e.g. Pixel 6 / Tensor).
+                        Spacer(modifier = Modifier.height(Spacing.MD))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = "Run AI on CPU",
+                                    style = MaterialTheme.typography.titleSmall,
+                                    fontWeight = FontWeight.Medium,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                                Spacer(modifier = Modifier.height(Spacing.XS))
+                                Text(
+                                    text = "Turn on if replies come back blank or never arrive. " +
+                                        "Slower to start, but reliable on every device.",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                            val cpuHaptic = LocalHapticFeedback.current
+                            Switch(
+                                checked = runOnCpu,
+                                onCheckedChange = { checked ->
+                                    cpuHaptic.toggleFeedback(checked)
+                                    runOnCpu = checked
+                                    chatViewModel.setRunOnCpu(checked)
+                                },
+                                colors = SwitchDefaults.colors(
+                                    checkedThumbColor = AppColors.current.accent,
+                                    checkedTrackColor = AppColors.current.accent.copy(alpha = Alpha.MUTED)
+                                )
+                            )
+                        }
                     } else {
                         Text(
                             text = "No model loaded",

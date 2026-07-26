@@ -56,6 +56,14 @@ open class PreferencesManager(private val context: Context) : InferenceConfigPro
         return prefs.getString("selected_model_id", "litert-1b-gemma") ?: "litert-1b-gemma"
     }
 
+    /**
+     * When true, the inference engine skips the GPU and runs on CPU. Useful on
+     * devices whose GPU is faster but unreliable for this model (e.g. Pixel 6 /
+     * Tensor, where the GPU can intermittently produce zero tokens or stall).
+     */
+    fun isRunOnCpu(): Boolean = prefs.getBoolean("run_on_cpu", false)
+    fun setRunOnCpu(enabled: Boolean) = prefs.edit().putBoolean("run_on_cpu", enabled).apply()
+
     // Content Versioning
     fun getContentVersion(): Int = prefs.getInt("content_version", 1)
     fun setContentVersion(version: Int) = prefs.edit().putInt("content_version", version).apply()
