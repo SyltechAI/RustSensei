@@ -117,7 +117,10 @@ fun ChatScreen(
                     (if (!uiState.isGenerating && uiState.followUpSuggestions.isNotEmpty() &&
                         uiState.messages.isNotEmpty() && uiState.messages.last().role == "assistant") 1 else 0)
             if (targetIndex > 0) {
-                listState.animateScrollToItem(targetIndex - 1)
+                // Instant (not animated): a burst of state updates at the end of a
+                // response would otherwise restart the scroll animation repeatedly and
+                // shake the bottom. Instant jumps all land on the same spot -> no shake.
+                listState.scrollToItem(targetIndex - 1)
             }
         }
     }
@@ -179,15 +182,13 @@ fun ChatScreen(
                         )
                     }
                 }
-                if (!inSheet) {
-                    IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                        Icon(
-                            Icons.Default.Menu,
-                            contentDescription = "Conversations",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(22.dp)
-                        )
-                    }
+                IconButton(onClick = { scope.launch { drawerState.open() } }) {
+                    Icon(
+                        Icons.Default.Menu,
+                        contentDescription = "Conversation history",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(22.dp)
+                    )
                 }
                 Text(
                     text = "RustSensei",
@@ -257,7 +258,12 @@ fun ChatScreen(
             LazyColumn(
                 modifier = Modifier.weight(1f),
                 state = listState,
-                contentPadding = PaddingValues(horizontal = Dimens.ScreenPadding, vertical = Spacing.MD)
+                contentPadding = PaddingValues(
+                    start = Dimens.ScreenPadding,
+                    end = Dimens.ScreenPadding,
+                    top = Spacing.MD,
+                    bottom = Spacing.LG
+                )
             ) {
                 // Context indicator banner
                 when (val ctx = chatContext) {
