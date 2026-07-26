@@ -193,7 +193,8 @@ fun ModelSetupScreen(
                     Spacer(modifier = Modifier.width(10.dp))
                     Text(
                         text = "Best performance on Google Tensor chips (Pixel 6+). " +
-                                "Other devices will use CPU mode, which is slower but functional.",
+                                "Other devices will use CPU mode, which is slower but functional. " +
+                                "Responses are AI-generated and may be incomplete or wrong; verify against the official Rust docs.",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         lineHeight = 18.sp

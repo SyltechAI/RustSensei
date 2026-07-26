@@ -34,6 +34,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sylvester.rustsensei.R
+import com.sylvester.rustsensei.ui.theme.Archivo
 import kotlinx.coroutines.delay
 
 private val Ink = Color(0xFF0B0B0C)
@@ -89,7 +90,7 @@ private fun BrandSplashContent() {
                 },
                 fontSize = 38.sp,
                 fontWeight = FontWeight.Black,
-                fontFamily = FontFamily.SansSerif,
+                fontFamily = Archivo,
                 modifier = Modifier.padding(top = 22.dp)
             )
             Box(
