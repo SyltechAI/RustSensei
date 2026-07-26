@@ -1,5 +1,7 @@
 package com.sylvester.rustsensei.ui.screens
 
+import android.app.ActivityManager
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.BorderStroke
@@ -21,7 +23,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Lightbulb
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Warning
@@ -55,6 +63,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import com.sylvester.rustsensei.ui.components.SpecLabel
@@ -118,6 +127,11 @@ fun SettingsScreen(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(bottom = Spacing.SM)
             )
+
+            // --- Tips Section ---
+            SectionHeader("Tips")
+            Spacer(modifier = Modifier.height(Spacing.MD))
+            TipsCard()
 
             // --- Appearance Section ---
             SectionHeader(stringResource(R.string.appearance))
@@ -289,6 +303,20 @@ fun SettingsScreen(
                             fontFamily = FontFamily.Monospace,
                             color = if (backend == "GPU") MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = Alpha.SOFT)
                                     else AppColors.current.amber.copy(alpha = Alpha.SOFT)
+                        )
+                        val ramContext = LocalContext.current
+                        val deviceRamGb = remember {
+                            (ramContext.getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager)?.let { am ->
+                                val mi = ActivityManager.MemoryInfo()
+                                am.getMemoryInfo(mi)
+                                mi.totalMem / (1024f * 1024f * 1024f)
+                            } ?: 0f
+                        }
+                        Text(
+                            text = "Device memory: %.1f GB".format(deviceRamGb),
+                            fontSize = 12.sp,
+                            fontFamily = FontFamily.Monospace,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = Alpha.SOFT)
                         )
                     } else {
                         Text(
@@ -523,6 +551,11 @@ fun SettingsScreen(
                 }
             }
 
+            // --- Support Section ---
+            SectionHeader("Support")
+            Spacer(modifier = Modifier.height(Spacing.MD))
+            SupportSection()
+
             // --- Danger Zone Section ---
             SectionHeader("Danger Zone")
             Spacer(modifier = Modifier.height(Spacing.MD))
@@ -650,8 +683,10 @@ fun SettingsScreen(
                     )
                     Spacer(modifier = Modifier.height(Spacing.SM))
                     Text(
-                        text = "RustSensei is a product of Syltech AI Systems, Inc. " +
-                            "Platforms, infrastructure, and the AI that runs on them.",
+                        text = "RustSensei is a product of Syltech AI Systems, Inc., a " +
+                            "Canadian consultancy in Kitchener, Ontario. Syltech works across " +
+                            "applied AI, cloud infrastructure, and enterprise identity and " +
+                            "authorization, from internal developer platforms to on-device inference.",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         lineHeight = 18.sp
@@ -867,6 +902,124 @@ fun SettingsScreen(
             dismissButton = {
                 TextButton(onClick = { showDeleteModelDialog = false }) { Text("Cancel") }
             }
+        )
+    }
+}
+
+@Composable
+private fun TipsCard() {
+    val tips = remember {
+        listOf(
+            "Switch teaching styles in Chat: Direct, Socratic, or Rubber Duck.",
+            "Stuck on an exercise or a Playground error? Tap Ask Sensei to pull your code straight into Chat.",
+            "Everything runs offline and private, entirely on your device.",
+            "Watch ownership and borrowing move step by step in the Visualizer.",
+            "Run real Rust in the Playground and compile it on demand.",
+            "Your dashboard suggests a next best action based on what you have done so far."
+        )
+    }
+    val tip = remember { tips.random() }
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(Dimens.CardRadius),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+        )
+    ) {
+        Row(
+            modifier = Modifier.padding(Dimens.CardPadding),
+            verticalAlignment = Alignment.Top
+        ) {
+            Icon(
+                Icons.Default.Lightbulb,
+                contentDescription = null,
+                tint = AppColors.current.accent,
+                modifier = Modifier.size(Dimens.IconSM)
+            )
+            Spacer(modifier = Modifier.width(Spacing.MD))
+            Text(
+                text = tip,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                lineHeight = 20.sp
+            )
+        }
+    }
+}
+
+@Composable
+private fun SupportSection() {
+    val ctx = LocalContext.current
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(Dimens.CardRadius),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+        )
+    ) {
+        Column {
+            SupportRow(Icons.Default.Favorite, "Star on GitHub") {
+                ctx.startActivity(
+                    Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/SyltechAI/RustSensei"))
+                )
+            }
+            SupportRow(Icons.Default.BugReport, "Report a bug") {
+                ctx.startActivity(
+                    Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/SyltechAI/RustSensei/issues"))
+                )
+            }
+            SupportRow(Icons.Default.Star, "Rate RustSensei") {
+                val appId = "com.sylvester.rustsensei"
+                try {
+                    ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$appId")))
+                } catch (_: Exception) {
+                    ctx.startActivity(
+                        Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=$appId"))
+                    )
+                }
+            }
+            SupportRow(Icons.Default.Share, "Share RustSensei") {
+                val send = Intent(Intent.ACTION_SEND).apply {
+                    type = "text/plain"
+                    putExtra(
+                        Intent.EXTRA_TEXT,
+                        "RustSensei: learn Rust with an offline, on-device AI tutor. " +
+                            "https://play.google.com/store/apps/details?id=com.sylvester.rustsensei"
+                    )
+                }
+                ctx.startActivity(Intent.createChooser(send, "Share RustSensei"))
+            }
+        }
+    }
+}
+
+@Composable
+private fun SupportRow(icon: ImageVector, label: String, onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() }
+            .padding(horizontal = Dimens.CardPadding, vertical = Spacing.MD),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            icon,
+            contentDescription = null,
+            tint = AppColors.current.accent,
+            modifier = Modifier.size(Dimens.IconSM)
+        )
+        Spacer(modifier = Modifier.width(Spacing.MD))
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.weight(1f)
+        )
+        Icon(
+            Icons.AutoMirrored.Filled.KeyboardArrowRight,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = Alpha.MUTED),
+            modifier = Modifier.size(Dimens.IconSM)
         )
     }
 }

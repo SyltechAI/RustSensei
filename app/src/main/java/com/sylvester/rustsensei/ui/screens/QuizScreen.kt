@@ -655,8 +655,8 @@ private fun TrueFalseAnswers(
                 modifier = Modifier
                     .weight(1f)
                     .aspectRatio(1.8f)
-                    .clip(RoundedCornerShape(14.dp))
-                    .border(borderW, borderColor, RoundedCornerShape(14.dp))
+                    .clip(RoundedCornerShape(12.dp))
+                    .border(borderW, borderColor, RoundedCornerShape(12.dp))
                     .background(bgColor)
                     .clickable(enabled = !answered) {
                         haptic.answerFeedback(isCorrect)
@@ -750,7 +750,7 @@ private fun CodeCompletionAnswer(
                 onClick = onSubmit,
                 modifier = Modifier.fillMaxWidth().height(52.dp),
                 enabled = codeInput.isNotBlank(),
-                shape = RoundedCornerShape(14.dp),
+                shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = AppColors.current.accent)
             ) {
                 Text("Submit", fontWeight = FontWeight.Bold)

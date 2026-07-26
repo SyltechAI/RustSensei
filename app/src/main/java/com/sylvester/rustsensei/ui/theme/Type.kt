@@ -1,10 +1,16 @@
+@file:OptIn(ExperimentalTextApi::class)
+
 package com.sylvester.rustsensei.ui.theme
 
 import androidx.compose.material3.Typography
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontVariation
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.sylvester.rustsensei.R
 
 // Syltech typography.
 // Brand: heavy geometric sans, uppercase + tracked for labels (Helvetica/Arial
@@ -14,7 +20,21 @@ import androidx.compose.ui.unit.sp
 // readouts), applied at those call sites via CodeFontFamily.
 val CodeFontFamily = FontFamily.Monospace
 
-private val Grotesk = FontFamily.Default
+// Archivo variable font (Google Fonts, OFL-1.1), bundled at res/font/archivo.ttf.
+// The brand's heavy geometric grotesk, now the real face instead of the Roboto stand-in.
+private fun archivoAxes(weight: Int) =
+    FontVariation.Settings(FontVariation.weight(weight), FontVariation.width(100f))
+
+internal val Archivo = FontFamily(
+    Font(R.font.archivo, FontWeight.Normal, variationSettings = archivoAxes(400)),
+    Font(R.font.archivo, FontWeight.Medium, variationSettings = archivoAxes(500)),
+    Font(R.font.archivo, FontWeight.SemiBold, variationSettings = archivoAxes(600)),
+    Font(R.font.archivo, FontWeight.Bold, variationSettings = archivoAxes(700)),
+    Font(R.font.archivo, FontWeight.ExtraBold, variationSettings = archivoAxes(800)),
+    Font(R.font.archivo, FontWeight.Black, variationSettings = archivoAxes(900))
+)
+
+private val Grotesk = Archivo
 
 val RustSenseiTypography = Typography(
     // ── Display / headlines — heavy geometric grotesk, tight tracking ──

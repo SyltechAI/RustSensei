@@ -374,7 +374,7 @@ private fun CategoriesView(
                         Box(
                             modifier = Modifier
                                 .size(40.dp)
-                                .clip(RoundedCornerShape(10.dp))
+                                .clip(RoundedCornerShape(12.dp))
                                 .background(AppColors.current.accent.copy(alpha = Alpha.BORDER)),
                             contentAlignment = Alignment.Center
                         ) {
