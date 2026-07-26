@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -28,6 +29,10 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.BottomSheetDefaults
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -84,14 +89,12 @@ import kotlin.reflect.KClass
 
 @Serializable object HomeRoute
 @Serializable object LearnRoute
-@Serializable object ChatTabRoute
 @Serializable object PracticeRoute
 @Serializable object ProfileRoute
 
 enum class Tab(val title: String, val icon: ImageVector, val routeClass: KClass<*>) {
     Home("Home", Icons.Default.Home, HomeRoute::class),
     Learn("Learn", Icons.AutoMirrored.Filled.MenuBook, LearnRoute::class),
-    Chat("Chat", Icons.AutoMirrored.Filled.Chat, ChatTabRoute::class),
     Practice("Practice", Icons.Default.Code, PracticeRoute::class),
     Profile("Settings", Icons.Default.Settings, ProfileRoute::class);
 }
@@ -106,7 +109,6 @@ private fun NavController.navigateToTab(tab: Tab) {
     when (tab) {
         Tab.Home -> navigate(HomeRoute, navOpts)
         Tab.Learn -> navigate(LearnRoute, navOpts)
-        Tab.Chat -> navigate(ChatTabRoute, navOpts)
         Tab.Practice -> navigate(PracticeRoute, navOpts)
         Tab.Profile -> navigate(ProfileRoute, navOpts)
     }
@@ -144,13 +146,14 @@ fun MainScreen(
     val currentDestination = navBackStackEntry?.destination
 
     // Switch tab when returning from Learning Paths with content loaded
+    var showChatSheet by remember { mutableStateOf(false) }
     val requestedTab by learningPathViewModel.requestedTab.collectAsState()
     LaunchedEffect(requestedTab) {
         val tab = requestedTab ?: return@LaunchedEffect
         when (tab) {
             "learn" -> tabNavController.navigateToTab(Tab.Learn)
             "practice" -> tabNavController.navigateToTab(Tab.Practice)
-            "chat" -> tabNavController.navigateToTab(Tab.Chat)
+            "chat" -> showChatSheet = true
         }
         learningPathViewModel.clearTabRequest()
     }
@@ -184,8 +187,7 @@ fun MainScreen(
         }
     }
 
-    val isChatActive = currentDestination?.hasRoute<ChatTabRoute>() == true
-    val hideTopBar = isChatActive || currentDestination?.hasRoute<ProfileRoute>() == true
+    val hideTopBar = currentDestination?.hasRoute<ProfileRoute>() == true
 
     Scaffold(
         topBar = {
@@ -224,17 +226,29 @@ fun MainScreen(
             }
         },
         bottomBar = {
-            if (!isChatActive) {
-                Column {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(1.dp)
-                            .background(MaterialTheme.colorScheme.primary.copy(alpha = Alpha.DIVIDER))
-                    )
-                    RustSenseiNavigationBar(
-                        onTabSelected = { tab -> tabNavController.navigateToTab(tab) },
-                        currentDestination = currentDestination
+            Column {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(1.dp)
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = Alpha.DIVIDER))
+                )
+                RustSenseiNavigationBar(
+                    onTabSelected = { tab -> tabNavController.navigateToTab(tab) },
+                    currentDestination = currentDestination
+                )
+            }
+        },
+        floatingActionButton = {
+            if (!hideTopBar) {
+                FloatingActionButton(
+                    onClick = { showChatSheet = true },
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                ) {
+                    Icon(
+                        Icons.AutoMirrored.Filled.Chat,
+                        contentDescription = "Chat with RustSensei"
                     )
                 }
             }
@@ -297,16 +311,8 @@ fun MainScreen(
                                 content = sectionContent
                             )
                         )
-                        tabNavController.navigateToTab(Tab.Chat)
+                        showChatSheet = true
                     }
-                )
-            }
-            composable<ChatTabRoute> {
-                ChatScreen(
-                    viewModel = chatViewModel,
-                    onNavigateToSettings = onNavigateToSettings,
-                    onNavigateToSetup = onNavigateToSetup,
-                    onNavigateBack = { tabNavController.navigateToTab(Tab.Home) }
                 )
             }
             composable<PracticeRoute> {
@@ -320,7 +326,7 @@ fun MainScreen(
                                 userCode = userCode
                             )
                         )
-                        tabNavController.navigateToTab(Tab.Chat)
+                        showChatSheet = true
                     },
                     onNavigateToQuiz = onNavigateToQuiz
                 )
@@ -366,6 +372,26 @@ fun MainScreen(
                             reminderScheduler.cancelReminders()
                         }
                     }
+                )
+            }
+        }
+    }
+
+    // Chat as a floating assistant, opened from the FAB or an Ask Sensei hand-off.
+    if (showChatSheet) {
+        val chatSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+        ModalBottomSheet(
+            onDismissRequest = { showChatSheet = false },
+            sheetState = chatSheetState,
+            dragHandle = { BottomSheetDefaults.DragHandle() }
+        ) {
+            Box(modifier = Modifier.fillMaxWidth().fillMaxHeight(0.94f)) {
+                ChatScreen(
+                    viewModel = chatViewModel,
+                    onNavigateToSettings = { showChatSheet = false; onNavigateToSettings() },
+                    onNavigateToSetup = { showChatSheet = false; onNavigateToSetup() },
+                    onNavigateBack = { showChatSheet = false },
+                    inSheet = true
                 )
             }
         }

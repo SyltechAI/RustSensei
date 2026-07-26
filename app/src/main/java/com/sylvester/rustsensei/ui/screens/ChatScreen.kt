@@ -91,7 +91,8 @@ fun ChatScreen(
     viewModel: ChatViewModel,
     onNavigateToSettings: () -> Unit,
     onNavigateToSetup: () -> Unit = {},
-    onNavigateBack: (() -> Unit)? = null
+    onNavigateBack: (() -> Unit)? = null,
+    inSheet: Boolean = false
 ) {
     val modelState by viewModel.modelState.collectAsState()
     val uiState by viewModel.uiState.collectAsState()
@@ -138,6 +139,7 @@ fun ChatScreen(
 
     ModalNavigationDrawer(
         drawerState = drawerState,
+        gesturesEnabled = !inSheet,
         drawerContent = {
             ConversationDrawer(
                 conversations = conversations,
@@ -162,7 +164,7 @@ fun ChatScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .statusBarsPadding()
+                    .then(if (inSheet) Modifier else Modifier.statusBarsPadding())
                     .height(Dimens.CompactTopBarHeight)
                     .padding(horizontal = Spacing.XS),
                 verticalAlignment = Alignment.CenterVertically
@@ -170,20 +172,22 @@ fun ChatScreen(
                 if (onNavigateBack != null) {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            if (inSheet) Icons.Default.Close else Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = if (inSheet) "Close" else "Back",
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(22.dp)
                         )
                     }
                 }
-                IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                    Icon(
-                        Icons.Default.Menu,
-                        contentDescription = "Conversations",
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(22.dp)
-                    )
+                if (!inSheet) {
+                    IconButton(onClick = { scope.launch { drawerState.open() } }) {
+                        Icon(
+                            Icons.Default.Menu,
+                            contentDescription = "Conversations",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(22.dp)
+                        )
+                    }
                 }
                 Text(
                     text = "RustSensei",
