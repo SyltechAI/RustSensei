@@ -26,6 +26,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Star
@@ -682,8 +683,10 @@ fun SettingsScreen(
                     )
                     Spacer(modifier = Modifier.height(Spacing.SM))
                     Text(
-                        text = "RustSensei is a product of Syltech AI Systems, Inc. " +
-                            "Platforms, infrastructure, and the AI that runs on them.",
+                        text = "RustSensei is a product of Syltech AI Systems, Inc., a " +
+                            "Canadian consultancy in Kitchener, Ontario. Syltech works across " +
+                            "applied AI, cloud infrastructure, and enterprise identity and " +
+                            "authorization, from internal developer platforms to on-device inference.",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         lineHeight = 18.sp
@@ -955,6 +958,11 @@ private fun SupportSection() {
         )
     ) {
         Column {
+            SupportRow(Icons.Default.Favorite, "Support the project") {
+                ctx.startActivity(
+                    Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/sponsors/sylvester-francis"))
+                )
+            }
             SupportRow(Icons.Default.BugReport, "Report a bug") {
                 ctx.startActivity(
                     Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/SyltechAI/RustSensei/issues"))
