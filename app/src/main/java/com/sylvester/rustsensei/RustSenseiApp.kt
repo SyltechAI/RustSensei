@@ -9,7 +9,9 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -23,6 +25,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.sylvester.rustsensei.ui.screens.ChatScreen
 import com.sylvester.rustsensei.ui.screens.DailyChallengeScreen
 import com.sylvester.rustsensei.ui.screens.DocsScreen
 import com.sylvester.rustsensei.ui.screens.ExplainErrorScreen
@@ -65,6 +68,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable object SetupRoute
 @Serializable object MainRoute
+@Serializable object ChatRoute
 @Serializable object SettingsRoute
 @Serializable object ReviewRoute
 @Serializable object LearningPathRoute
@@ -151,6 +155,7 @@ fun RustSenseiApp(
                 reminderScheduler = reminderScheduler,
                 onNavigateToSettings = { navController.navigate(SettingsRoute) },
                 onNavigateToSetup = { navController.navigate(SetupRoute) },
+                onNavigateToChat = { navController.navigate(ChatRoute) },
                 onNavigateToReview = { navController.navigate(ReviewRoute) },
                 onNavigateToLearningPaths = { navController.navigate(LearningPathRoute) },
                 onNavigateToQuiz = { navController.navigate(QuizRoute) },
@@ -162,6 +167,26 @@ fun RustSenseiApp(
                 onNavigateToDocs = { navController.navigate(DocsRoute) },
                 onNavigateToVisualizer = { navController.navigate(VisualizerRoute) },
                 onNavigateToProjects = { navController.navigate(ProjectRoute) }
+            )
+        }
+
+        // Chat is a focused full-screen destination opened from the Home FAB.
+        // It slides up from the bottom (and back down on close) so it reads like
+        // a floating assistant rising over the app, without the fragility of
+        // hosting the whole chat UI inside a bottom-sheet window.
+        composable<ChatRoute>(
+            enterTransition = {
+                slideInVertically(animationSpec = tween(320)) { it } + fadeIn(animationSpec = tween(200))
+            },
+            popExitTransition = {
+                slideOutVertically(animationSpec = tween(260)) { it } + fadeOut(animationSpec = tween(180))
+            }
+        ) {
+            ChatScreen(
+                viewModel = chatViewModel,
+                onNavigateToSettings = { navController.navigate(SettingsRoute) },
+                onNavigateToSetup = { navController.navigate(SetupRoute) },
+                onNavigateBack = { navController.popBackStack() }
             )
         }
 

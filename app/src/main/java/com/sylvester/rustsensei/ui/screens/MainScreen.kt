@@ -11,8 +11,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -30,10 +28,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -131,6 +126,7 @@ fun MainScreen(
     reminderScheduler: ReminderScheduler,
     onNavigateToSettings: () -> Unit,
     onNavigateToSetup: () -> Unit = {},
+    onNavigateToChat: () -> Unit = {},
     onNavigateToReview: () -> Unit = {},
     onNavigateToLearningPaths: () -> Unit = {},
     onNavigateToQuiz: () -> Unit = {},
@@ -148,7 +144,6 @@ fun MainScreen(
     val currentDestination = navBackStackEntry?.destination
 
     // Switch tab when returning from Learning Paths with content loaded
-    var showChatSheet by remember { mutableStateOf(false) }
     val chatModelState by chatViewModel.modelState.collectAsState()
     val requestedTab by learningPathViewModel.requestedTab.collectAsState()
     LaunchedEffect(requestedTab) {
@@ -156,7 +151,7 @@ fun MainScreen(
         when (tab) {
             "learn" -> tabNavController.navigateToTab(Tab.Learn)
             "practice" -> tabNavController.navigateToTab(Tab.Practice)
-            "chat" -> showChatSheet = true
+            "chat" -> onNavigateToChat()
         }
         learningPathViewModel.clearTabRequest()
     }
@@ -249,7 +244,7 @@ fun MainScreen(
                     onClick = {
                         // Failsafe: no model means no chat. Send to download instead
                         // of opening a chat that can't run.
-                        if (needsModel) onNavigateToSetup() else showChatSheet = true
+                        if (needsModel) onNavigateToSetup() else onNavigateToChat()
                     },
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary
@@ -319,7 +314,7 @@ fun MainScreen(
                                 content = sectionContent
                             )
                         )
-                        showChatSheet = true
+                        onNavigateToChat()
                     }
                 )
             }
@@ -334,7 +329,7 @@ fun MainScreen(
                                 userCode = userCode
                             )
                         )
-                        showChatSheet = true
+                        onNavigateToChat()
                     },
                     onNavigateToQuiz = onNavigateToQuiz
                 )
@@ -385,25 +380,6 @@ fun MainScreen(
         }
     }
 
-    // Chat as a floating assistant, opened from the FAB or an Ask Sensei hand-off.
-    if (showChatSheet) {
-        val chatSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-        ModalBottomSheet(
-            onDismissRequest = { showChatSheet = false },
-            sheetState = chatSheetState,
-            dragHandle = { BottomSheetDefaults.DragHandle() }
-        ) {
-            Box(modifier = Modifier.fillMaxWidth().fillMaxHeight(0.94f)) {
-                ChatScreen(
-                    viewModel = chatViewModel,
-                    onNavigateToSettings = { showChatSheet = false; onNavigateToSettings() },
-                    onNavigateToSetup = { showChatSheet = false; onNavigateToSetup() },
-                    onNavigateBack = { showChatSheet = false },
-                    inSheet = true
-                )
-            }
-        }
-    }
 }
 
 @Composable

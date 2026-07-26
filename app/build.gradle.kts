@@ -27,7 +27,7 @@ android {
         applicationId = "com.sylvester.rustsensei"
         minSdk = 26
         targetSdk = 35
-        versionCode = 31
+        versionCode = 32
         versionName = "1.4.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
