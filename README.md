@@ -11,7 +11,7 @@
 
 > No internet required after the initial model download. No data leaves your device.
 
-[![GitHub release](https://img.shields.io/github/v/release/sylvester-francis/RustSensei)](https://github.com/sylvester-francis/RustSensei/releases)
+[![GitHub release](https://img.shields.io/github/v/release/SyltechAI/RustSensei)](https://github.com/SyltechAI/RustSensei/releases)
 ![Kotlin](https://img.shields.io/badge/Kotlin-2.2-7F52FF?logo=kotlin&logoColor=white)
 ![Jetpack Compose](https://img.shields.io/badge/Jetpack_Compose-Material_3-4285F4?logo=jetpackcompose&logoColor=white)
 ![LiteRT](https://img.shields.io/badge/LiteRT-GPU_Accelerated-FF6F00?logo=tensorflow&logoColor=white)
@@ -32,7 +32,7 @@
 <p align="center">
   <img src="screenshots/phone_04_exercises.png" width="270" alt="Exercises" />
   <img src="screenshots/phone_05_quiz.png" width="270" alt="Quiz" />
-  <img src="screenshots/phone_06_model_setup.png" width="270" alt="Model Setup" />
+  <img src="screenshots/phone_06_visualizer.png" width="270" alt="Ownership Visualizer" />
 </p>
 
 ## Why RustSensei?
@@ -43,7 +43,7 @@ Most programming tutors require a constant internet connection and send your dat
 
 ## Features
 
-- **On-Device AI Tutor** — fine-tuned 1B parameter LLM with GPU-accelerated streaming inference via LiteRT
+- **On-Device AI Tutor** — fine-tuned 1B parameter LLM with GPU-accelerated streaming inference via LiteRT, with automatic CPU fallback on unsupported GPUs
 - **Context-Aware Help** — ask about a book section or get help with an exercise, and the AI has full context
 - **Socratic & Rubber Duck Modes** — AI asks guiding questions or lets you explain concepts back, with 3 switchable chat modes
 - **Rust Playground** — write Rust code and see simulated output via on-device AI execution tracing
@@ -75,7 +75,7 @@ Most programming tutors require a constant internet connection and send your dat
 
 ## Install
 
-Download the latest signed APK from [GitHub Releases](https://github.com/sylvester-francis/RustSensei/releases):
+Download the latest signed APK from [GitHub Releases](https://github.com/SyltechAI/RustSensei/releases):
 
 1. Download `app-release.apk` from the latest release
 2. On your Android device, enable **Settings > Install from Unknown Sources** for your browser
@@ -92,14 +92,14 @@ Downloads from Hugging Face on first use:
 |-------|-----------|-------------|------|-----|
 | [Rust Mentor 1B](https://huggingface.co/sylvester-francis/rust-mentor-1b-mobile-LiteRT) | 1B | Q8 | ~1.2 GB | ~3 GB |
 
-The model runs entirely on-device using the GPU via LiteRT's OpenCL delegate. No data is sent to any server.
+The model runs entirely on-device via LiteRT — GPU-accelerated through the OpenCL delegate, with an automatic CPU fallback for devices whose GPU can't run it. No data is sent to any server.
 
 ## Requirements
 
 | Requirement | Minimum |
 |-------------|---------|
 | Android | 8.0+ (API 26) |
-| GPU | Required (tested on Pixel 8 Pro / Tensor G3) |
+| GPU | Recommended — GPU-accelerated, with automatic CPU fallback |
 | Storage | ~1.2 GB for the model |
 | RAM | ~3 GB available for inference |
 
@@ -137,7 +137,7 @@ app/src/main/java/com/sylvester/rustsensei/
 │   ├── LiteRtEngine.kt      # LiteRT GPU implementation
 │   ├── ModelLifecycleManager.kt  # Load/unload/idle-timer lifecycle
 │   ├── ModelManager.kt      # Download with resume + SHA256 verification
-│   └── ChatTemplateFormatter.kt  # ChatML formatting + sanitization
+│   └── ChatTemplateFormatter.kt  # Gemma chat formatting + sanitization
 ├── ui/
 │   ├── theme/               # Color, Type, Tokens (Spacing, Alpha, Dimens)
 │   ├── components/          # 20+ reusable composables
@@ -169,7 +169,7 @@ app/src/main/java/com/sylvester/rustsensei/
 **Prerequisites:** Android Studio, JDK 11+
 
 ```bash
-git clone https://github.com/sylvester-francis/RustSensei.git
+git clone https://github.com/SyltechAI/RustSensei.git
 cd RustSensei
 ./gradlew assembleDebug
 adb install app/build/outputs/apk/debug/app-debug.apk
