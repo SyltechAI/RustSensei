@@ -958,9 +958,9 @@ private fun SupportSection() {
         )
     ) {
         Column {
-            SupportRow(Icons.Default.Favorite, "Support the project") {
+            SupportRow(Icons.Default.Favorite, "Star on GitHub") {
                 ctx.startActivity(
-                    Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/sponsors/sylvester-francis"))
+                    Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/SyltechAI/RustSensei"))
                 )
             }
             SupportRow(Icons.Default.BugReport, "Report a bug") {
