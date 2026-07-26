@@ -21,6 +21,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.Code
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.Search
@@ -65,6 +66,7 @@ import androidx.navigation.compose.rememberNavController
 import com.sylvester.rustsensei.ui.theme.Alpha
 import com.sylvester.rustsensei.ui.theme.Dimens
 import com.sylvester.rustsensei.viewmodel.BookViewModel
+import com.sylvester.rustsensei.llm.ModelReadyState
 import com.sylvester.rustsensei.viewmodel.ChatContext
 import com.sylvester.rustsensei.viewmodel.ChatViewModel
 import com.sylvester.rustsensei.viewmodel.ExerciseViewModel
@@ -147,6 +149,7 @@ fun MainScreen(
 
     // Switch tab when returning from Learning Paths with content loaded
     var showChatSheet by remember { mutableStateOf(false) }
+    val chatModelState by chatViewModel.modelState.collectAsState()
     val requestedTab by learningPathViewModel.requestedTab.collectAsState()
     LaunchedEffect(requestedTab) {
         val tab = requestedTab ?: return@LaunchedEffect
@@ -241,14 +244,19 @@ fun MainScreen(
         },
         floatingActionButton = {
             if (!hideTopBar) {
+                val needsModel = chatModelState == ModelReadyState.NOT_DOWNLOADED
                 FloatingActionButton(
-                    onClick = { showChatSheet = true },
+                    onClick = {
+                        // Failsafe: no model means no chat. Send to download instead
+                        // of opening a chat that can't run.
+                        if (needsModel) onNavigateToSetup() else showChatSheet = true
+                    },
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 ) {
                     Icon(
-                        Icons.AutoMirrored.Filled.Chat,
-                        contentDescription = "Chat with RustSensei"
+                        if (needsModel) Icons.Default.Download else Icons.AutoMirrored.Filled.Chat,
+                        contentDescription = if (needsModel) "Download the AI model" else "Chat with RustSensei"
                     )
                 }
             }
