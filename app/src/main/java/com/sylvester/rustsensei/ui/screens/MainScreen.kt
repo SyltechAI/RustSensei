@@ -1,11 +1,8 @@
 package com.sylvester.rustsensei.ui.screens
 
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -243,18 +240,9 @@ fun MainScreen(
             }
         }
     ) { innerPadding ->
-        val tabEnterTransition = fadeIn(
-            animationSpec = spring(stiffness = Spring.StiffnessMedium)
-        ) + slideInVertically(
-            initialOffsetY = { 24 },
-            animationSpec = spring(stiffness = Spring.StiffnessMedium)
-        )
-        val tabExitTransition = fadeOut(
-            animationSpec = spring(stiffness = Spring.StiffnessMedium)
-        ) + slideOutVertically(
-            targetOffsetY = { -24 },
-            animationSpec = spring(stiffness = Spring.StiffnessMedium)
-        )
+        // Tabs are peers: a clean crossfade reads better than a directional slide.
+        val tabEnterTransition = fadeIn(animationSpec = tween(220))
+        val tabExitTransition = fadeOut(animationSpec = tween(180))
 
         NavHost(
             navController = tabNavController,

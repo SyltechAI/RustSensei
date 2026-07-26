@@ -5,6 +5,11 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -100,7 +105,21 @@ fun RustSenseiApp(
 
     NavHost(
         navController = navController,
-        startDestination = MainRoute
+        startDestination = MainRoute,
+        // Shared-axis-X: pushed screens slide in from the right and fade;
+        // going back reverses it. Smooth, directional, native-feeling.
+        enterTransition = {
+            slideInHorizontally(animationSpec = tween(300)) { it / 4 } + fadeIn(animationSpec = tween(300))
+        },
+        exitTransition = {
+            slideOutHorizontally(animationSpec = tween(300)) { -it / 4 } + fadeOut(animationSpec = tween(300))
+        },
+        popEnterTransition = {
+            slideInHorizontally(animationSpec = tween(300)) { -it / 4 } + fadeIn(animationSpec = tween(300))
+        },
+        popExitTransition = {
+            slideOutHorizontally(animationSpec = tween(300)) { it / 4 } + fadeOut(animationSpec = tween(300))
+        }
     ) {
         composable<SetupRoute> {
             ModelSetupScreen(
