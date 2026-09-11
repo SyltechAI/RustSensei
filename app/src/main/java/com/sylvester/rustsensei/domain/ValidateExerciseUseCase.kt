@@ -8,6 +8,7 @@ import com.sylvester.rustsensei.llm.ModelLifecycle
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
+import kotlin.coroutines.cancellation.CancellationException
 
 /**
  * Validates a student's Rust code against an exercise using the on-device LLM.
@@ -54,6 +55,8 @@ class ValidateExerciseUseCase @Inject constructor(
                     ChatTemplateFormatter.stripThinkTags(buffer.toString())
                 ))
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             emit(ValidationEvent.Error(e.message ?: "Validation failed"))
             return@flow

@@ -1,6 +1,6 @@
 package com.sylvester.rustsensei.domain
 
-import com.sylvester.rustsensei.content.RagRetriever
+import com.sylvester.rustsensei.content.ContextRetriever
 import com.sylvester.rustsensei.data.ChatRepository
 import com.sylvester.rustsensei.llm.ChatMode
 import com.sylvester.rustsensei.llm.ChatTemplateFormatter
@@ -8,9 +8,13 @@ import com.sylvester.rustsensei.llm.InferenceConfig
 import com.sylvester.rustsensei.llm.InferenceEngine
 import com.sylvester.rustsensei.llm.ModelLifecycle
 import com.sylvester.rustsensei.viewmodel.ChatContext
+import android.util.Log
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import kotlin.coroutines.cancellation.CancellationException
 
 /**
  * Orchestrates the full lifecycle of sending a chat message:
@@ -24,10 +28,14 @@ import javax.inject.Inject
  */
 class SendChatMessageUseCase @Inject constructor(
     private val chatRepository: ChatRepository,
-    private val ragRetriever: RagRetriever,
+    private val ragRetriever: ContextRetriever,
     private val engine: InferenceEngine,
     private val modelLifecycle: ModelLifecycle
 ) {
+
+    private companion object {
+        const val TAG = "SendChatMessageUseCase"
+    }
 
     operator fun invoke(
         conversationId: Long,
@@ -36,20 +44,48 @@ class SendChatMessageUseCase @Inject constructor(
         config: InferenceConfig,
         chatMode: ChatMode = ChatMode.DIRECT
     ): Flow<ChatStreamEvent> = flow {
-        if (!modelLifecycle.ensureLoaded()) {
+        val loaded = try {
+            modelLifecycle.ensureLoaded()
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Log.e(TAG, "Model load failed: ${e.message}", e)
+            false
+        }
+        if (!loaded) {
             emit(ChatStreamEvent.Error("Model not available. Download from Settings."))
             return@flow
         }
 
-        chatRepository.addMessage(conversationId, "user", message)
+        // Everything up to generation touches the database and the bundled RAG
+        // assets. A failure there (disk full, corrupt row, malformed asset) used
+        // to escape the flow and take the process down, because the collector in
+        // ChatViewModel runs in viewModelScope with no handler.
+        val prompt = try {
+            chatRepository.addMessage(conversationId, "user", message)
 
-        val ragContext = resolveContext(message, chatContext)
-        val allMessages = chatRepository.getMessagesOnce(conversationId)
-        val prompt = ChatTemplateFormatter.formatMessages(
-            allMessages, config.contextLength, ragContext = ragContext, chatMode = chatMode
-        )
+            val ragContext = resolveContext(message, chatContext)
+            val allMessages = chatRepository.getMessagesOnce(conversationId)
+            ChatTemplateFormatter.formatMessages(
+                allMessages, config.contextLength, ragContext = ragContext, chatMode = chatMode
+            )
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            emit(ChatStreamEvent.Error(
+                "Could not prepare your message: ${e.message ?: "unknown error"}"
+            ))
+            return@flow
+        }
 
-        engine.clearCache()
+        try {
+            engine.clearCache()
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            emit(ChatStreamEvent.Error("The tutor could not be reset: ${e.message ?: "unknown error"}"))
+            return@flow
+        }
 
         val startTime = System.currentTimeMillis()
         val buffer = StringBuilder()
@@ -66,15 +102,29 @@ class SendChatMessageUseCase @Inject constructor(
                     ChatTemplateFormatter.stripThinkTags(buffer.toString())
                 ))
             }
+        } catch (e: CancellationException) {
+            // The user tapped Stop. Persist whatever was streamed so the partial
+            // answer survives, then let cancellation propagate - swallowing it
+            // here wrote an "Error: ... was cancelled" turn into chat history.
+            persistPartial(conversationId, buffer)
+            throw e
         } catch (e: Exception) {
-            chatRepository.addMessage(conversationId, "assistant", "Error: ${e.message}")
             emit(ChatStreamEvent.Error(e.message ?: "Generation failed"))
             return@flow
         }
 
         val finalText = ChatTemplateFormatter.stripThinkTags(buffer.toString()).trim()
         if (finalText.isNotEmpty()) {
-            chatRepository.addMessage(conversationId, "assistant", finalText)
+            try {
+                chatRepository.addMessage(conversationId, "assistant", finalText)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                // The answer is already on screen; losing the history row is
+                // recoverable, crashing on the way out is not.
+                emit(ChatStreamEvent.Error("Reply could not be saved to history: ${e.message}"))
+                return@flow
+            }
         }
 
         emit(ChatStreamEvent.Completed(
@@ -83,6 +133,23 @@ class SendChatMessageUseCase @Inject constructor(
             decodeTokPerSec = decodeTokPerSec,
             prefillMs = prefillMs
         ))
+    }
+
+    /**
+     * Best-effort save of a stopped generation. The coroutine is already cancelled
+     * at this point, so the write runs under NonCancellable; a failure here is
+     * dropped rather than masking the cancellation.
+     */
+    private suspend fun persistPartial(conversationId: Long, buffer: StringBuilder) {
+        val partial = ChatTemplateFormatter.stripThinkTags(buffer.toString()).trim()
+        if (partial.isEmpty()) return
+        withContext(NonCancellable) {
+            try {
+                chatRepository.addMessage(conversationId, "assistant", partial)
+            } catch (e: Exception) {
+                Log.w(TAG, "Could not save stopped reply: ${e.message}")
+            }
+        }
     }
 
     private suspend fun resolveContext(message: String, context: ChatContext): String? =

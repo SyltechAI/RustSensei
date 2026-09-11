@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.flow
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import javax.inject.Inject
+import kotlin.coroutines.cancellation.CancellationException
 
 class CompileCodeUseCase @Inject constructor(
     private val playgroundService: RustPlaygroundService
@@ -27,6 +28,8 @@ class CompileCodeUseCase @Inject constructor(
                 stderr = response.stderr,
                 elapsedMs = System.currentTimeMillis() - startTime
             ))
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: UnknownHostException) {
             emit(CompileCodeEvent.Error("No internet connection. Check your network and try again."))
         } catch (e: SocketTimeoutException) {

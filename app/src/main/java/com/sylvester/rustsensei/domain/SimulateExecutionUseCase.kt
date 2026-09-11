@@ -7,6 +7,7 @@ import com.sylvester.rustsensei.llm.ModelLifecycle
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
+import kotlin.coroutines.cancellation.CancellationException
 
 open class SimulateExecutionUseCase @Inject constructor(
     private val engine: InferenceEngine,
@@ -29,6 +30,10 @@ open class SimulateExecutionUseCase @Inject constructor(
                 buffer.append(token)
                 emit(ExecutionEvent.Output(ChatTemplateFormatter.stripThinkTags(buffer.toString())))
             }
+        } catch (e: CancellationException) {
+            // Structured cancellation must pass through: emitting after the
+            // collector is gone is an error, and the user already sees a stop.
+            throw e
         } catch (e: Exception) {
             emit(ExecutionEvent.Error(e.message ?: "Execution simulation failed"))
             return@flow

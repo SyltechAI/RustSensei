@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import org.json.JSONObject
 import javax.inject.Inject
+import kotlin.coroutines.cancellation.CancellationException
 
 sealed interface ErrorExplanationEvent {
     data class Token(val displayText: String) : ErrorExplanationEvent
@@ -56,6 +57,8 @@ open class ExplainErrorUseCase @Inject constructor(
                     ChatTemplateFormatter.stripThinkTags(buffer.toString())
                 ))
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             emit(ErrorExplanationEvent.Error(e.message ?: "Explanation failed"))
             return@flow
