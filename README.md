@@ -9,7 +9,7 @@
 
 **An offline Android app that teaches Rust programming through an on-device AI tutor, interactive exercises, quizzes, and a structured book — all running locally via LiteRT.**
 
-> No internet required after the initial model download. No data leaves your device.
+> No internet required after the initial model download. The tutor, the book, exercises and all your progress stay on your device. Two opt-in features (Compile and Run tests) send the code in your editor to the Rust Playground; nothing else leaves.
 
 [![GitHub release](https://img.shields.io/github/v/release/SyltechAI/RustSensei)](https://github.com/SyltechAI/RustSensei/releases)
 ![Kotlin](https://img.shields.io/badge/Kotlin-2.2-7F52FF?logo=kotlin&logoColor=white)
@@ -40,6 +40,8 @@
 Most programming tutors require a constant internet connection and send your data to cloud servers. RustSensei takes a different approach:
 
 **Everything runs on your device.** A fine-tuned 1B parameter LLM runs locally via Google's LiteRT with GPU acceleration. Your conversations, progress, and learning data never leave your phone. Pair that with a full Rust curriculum — book, exercises, quizzes, flashcards — and you have a complete Rust learning environment in your pocket.
+
+The one deliberate exception: **Compile** and **Run tests** post the code in your editor to the official [Rust Playground](https://play.rust-lang.org) so real `rustc` builds it. Both are opt-in, ask for consent the first time, and are the only requests the app makes after the model download.
 
 ## Features
 
@@ -92,7 +94,7 @@ Downloads from Hugging Face on first use:
 |-------|-----------|-------------|------|-----|
 | [Rust Mentor 1B](https://huggingface.co/sylvester-francis/rust-mentor-1b-mobile-LiteRT) | 1B | Q8 | ~1.2 GB | ~3 GB |
 
-The model runs entirely on-device via LiteRT — GPU-accelerated through the OpenCL delegate, with an automatic CPU fallback for devices whose GPU can't run it. No data is sent to any server.
+The model runs entirely on-device via LiteRT — GPU-accelerated through the OpenCL delegate, with an automatic CPU fallback for devices whose GPU can't run it. Prompts and responses never leave the device.
 
 ## Requirements
 
@@ -185,11 +187,18 @@ adb install app/build/outputs/apk/debug/app-debug.apk
 
 ## Privacy
 
-RustSensei collects no data. No analytics, no tracking, no accounts, no telemetry. Everything runs on-device. See [Privacy Policy](PRIVACY_POLICY.md).
+RustSensei collects no data. No analytics, no tracking, no accounts, no telemetry.
 
-## Author
+The app makes network requests in exactly three cases: the one-time model download from Hugging Face, and the opt-in **Compile** and **Run tests** actions, which send the Rust code in your editor to `play.rust-lang.org` and nothing else. Chat, notes, progress, and flashcards are never uploaded. See [Privacy Policy](PRIVACY_POLICY.md) for the full breakdown.
 
-**Sylvester Ranjith Francis**
+## Maker
+
+RustSensei is a product of **[Syltech AI Systems, Inc.](https://syltechai.dev/)**, a Canadian consultancy in Kitchener, Ontario.
+
+[![Syltech](https://img.shields.io/badge/Syltech_AI_Systems-syltechai.dev-ff5c00)](https://syltechai.dev/)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Syltech_AI_Systems-0A66C2?logo=linkedin)](https://www.linkedin.com/company/syltech-ai-systems-inc/)
+
+Built by **Sylvester Ranjith Francis**
 
 [![GitHub](https://img.shields.io/badge/GitHub-sylvester--francis-181717?logo=github)](https://github.com/sylvester-francis)
 [![Hugging Face](https://img.shields.io/badge/Hugging_Face-sylvester--francis-FFD21E?logo=huggingface&logoColor=black)](https://huggingface.co/sylvester-francis)

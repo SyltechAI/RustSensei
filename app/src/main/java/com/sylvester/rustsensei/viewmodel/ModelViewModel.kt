@@ -65,6 +65,9 @@ class ModelViewModel @Inject constructor(
 
     companion object {
         private const val TAG = "ModelViewModel"
+
+        /** Anything smaller than this is a stub or a truncated download, not a model. */
+        private const val MIN_VALID_MODEL_BYTES = 1_000_000L
     }
 
     private val _uiState = MutableStateFlow(ModelUiState())
@@ -125,13 +128,47 @@ class ModelViewModel @Inject constructor(
 
     fun startDownload() {
         val modelInfo = getSelectedModelInfo()
+
+        // Checked here as well as in the download itself so the user is told
+        // before a foreground service and a progress bar appear.
+        if (modelManager.hasInsufficientSpace(modelInfo)) {
+            val neededMB = modelManager.requiredFreeBytes(modelInfo) / (1024 * 1024)
+            val freeMB = modelManager.usableSpaceBytes() / (1024 * 1024)
+            _uiState.value = _uiState.value.copy(
+                modelState = ModelState.ERROR,
+                errorMessage = "Not enough storage. ${modelInfo.displayName} needs about " +
+                    "$neededMB MB free and this device has $freeMB MB. " +
+                    "Free up some space and try again."
+            )
+            return
+        }
+
         _uiState.value = _uiState.value.copy(
             modelState = ModelState.DOWNLOADING,
             errorMessage = null
         )
         // The download runs in ModelDownloadService (foreground, wake-lock-free);
         // progress is surfaced via observeDownloadState().
-        ModelDownloadService.start(application, modelInfo.id)
+        if (!ModelDownloadService.start(application, modelInfo.id)) {
+            // The platform refused the foreground start (app no longer foreground).
+            // Without this the UI would sit on a progress bar that never moves.
+            _uiState.value = _uiState.value.copy(
+                modelState = ModelState.ERROR,
+                errorMessage = "Could not start the download. Reopen RustSensei and try again."
+            )
+        }
+    }
+
+    /** Cancels an in-flight download. The partial file is kept so it can resume. */
+    fun cancelDownload() {
+        ModelDownloadService.cancel(application)
+        checkModelStatus()
+        _uiState.value = _uiState.value.copy(
+            downloadProgress = 0f,
+            downloadSpeedMBps = 0f,
+            estimatedSecondsLeft = 0,
+            errorMessage = null
+        )
     }
 
     /**
@@ -183,7 +220,23 @@ class ModelViewModel @Inject constructor(
                     engine.unloadModel()
                 }
 
-                val modelPath = modelManager.getModelFile(modelInfo).absolutePath
+                val modelFile = modelManager.getModelFile(modelInfo)
+                // The file can vanish between the status check and here: an
+                // uninstall-cleanup, a storage manager, or a failed download that
+                // left a stub. Handing a missing path to native code crashes the
+                // process instead of failing cleanly.
+                if (!modelFile.exists() || modelFile.length() < MIN_VALID_MODEL_BYTES) {
+                    Log.w(TAG, "Model file missing or too small: ${modelFile.absolutePath}")
+                    checkModelStatus()
+                    _uiState.value = _uiState.value.copy(
+                        modelState = ModelState.NOT_DOWNLOADED,
+                        errorMessage = "The model file is missing or incomplete. " +
+                            "Download it again from Settings."
+                    )
+                    return@launch
+                }
+
+                val modelPath = modelFile.absolutePath
                 val contextSize = InferenceConfig.forModel(modelInfo.id).contextLength
                 val success = engine.loadModel(modelPath, contextSize)
                 if (success) {

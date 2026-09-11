@@ -74,6 +74,7 @@ import com.sylvester.rustsensei.ui.theme.SecondaryText
 import com.sylvester.rustsensei.ui.theme.Spacing
 import com.sylvester.rustsensei.viewmodel.ExerciseViewModel
 import com.sylvester.rustsensei.ui.theme.AppColors
+import com.sylvester.rustsensei.ui.components.rememberNetworkComputeGate
 
 // ---- EXERCISE DETAIL VIEW ---------------------------------------------------
 
@@ -656,9 +657,17 @@ internal fun ExerciseDetailView(
                 }
 
                 if (hasTests) {
+                    // Running tests posts the user's code to play.rust-lang.org.
+                    val (requestRunTests, testsConsentDialog) = rememberNetworkComputeGate(
+                        hasAccepted = viewModel::hasAcceptedRemoteCompile,
+                        onAccepted = viewModel::acceptRemoteCompile,
+                        action = viewModel::runTests
+                    )
+                    testsConsentDialog()
+
                     Button(
                         onClick = {
-                            if (uiState.isRunningTests) viewModel.stopTests() else viewModel.runTests()
+                            if (uiState.isRunningTests) viewModel.stopTests() else requestRunTests()
                         },
                         modifier = Modifier
                             .weight(1f)

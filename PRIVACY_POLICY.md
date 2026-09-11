@@ -1,10 +1,12 @@
 # Privacy Policy — RustSensei
 
-**Last updated:** March 19, 2026
+**Last updated:** September 10, 2026
 
 ## Overview
 
-RustSensei is an offline Rust programming tutor for Android. The app is designed with privacy as a core principle — all learning and AI tutoring happens entirely on your device.
+RustSensei is an offline-first Rust programming tutor for Android, published by Syltech AI Systems, Inc. The app is designed with privacy as a core principle: the AI tutor, the book, exercises, quizzes, and all your progress run entirely on your device.
+
+Two optional features send data off the device, and only when you ask them to. They are described in full under [Network Usage](#network-usage).
 
 ## Data Collection
 
@@ -17,7 +19,7 @@ RustSensei is an offline Rust programming tutor for Android. The app is designed
 
 ## Data Stored on Device
 
-The following data is stored locally on your device only and never leaves it:
+The following data is stored locally on your device and is never uploaded anywhere:
 
 - **Chat conversations** — your messages and AI responses, stored in a local database
 - **Learning progress** — chapters read, exercises completed, quiz scores, study streaks
@@ -25,13 +27,33 @@ The following data is stored locally on your device only and never leaves it:
 - **Notes** — any notes you write while reading
 - **App preferences** — theme, inference settings, selected model
 
+Your **saved exercise and Playground code** is also stored locally. It stays on the device unless you tap Compile or Run tests, which sends that code to the Rust Playground as described under [Network Usage](#network-usage).
+
 All local data can be deleted at any time from the Settings screen within the app.
 
 ## Network Usage
 
-RustSensei requires internet access **only** for the initial AI model download (~1.2 GB) from Hugging Face. After the model is downloaded, the app functions entirely offline.
+RustSensei makes network requests in exactly three situations. There are no others.
 
-No other network requests are made. No data is uploaded to any server.
+### 1. Downloading the AI model (one time)
+
+The on-device language model (~1.2 GB) is downloaded from [Hugging Face](https://huggingface.co). This is a plain file download. No personal data is sent with it. After the model is downloaded the tutor works with no connection at all.
+
+### 2. Compile (Playground)
+
+If you tap **Compile** in the Playground, the Rust source code currently in the editor is sent over HTTPS to the official Rust Playground service at `play.rust-lang.org`, operated by the Rust Project. It is compiled there by real `rustc` and the compiler output is returned to your device.
+
+### 3. Run tests (Exercises)
+
+If you tap **Run tests** on an exercise, your solution code and that exercise's test code are sent over HTTPS to the same Rust Playground service and the test output is returned.
+
+**What is sent:** only the code in the editor at that moment, plus fixed compiler options (channel, edition, mode). No account identifier, no device identifier, no other app data.
+
+**When it is sent:** only when you tap Compile or Run tests. The first time you do, RustSensei asks for your explicit consent and explains where the code is going. If you decline, both features stay off and everything else keeps working, including the simulated on-device runner in the Playground.
+
+**Who receives it:** the Rust Project, under its own terms. See the [Rust Playground](https://play.rust-lang.org) and [rust-lang.org policies](https://www.rust-lang.org/policies/privacy).
+
+RustSensei does not upload your chat history, notes, progress, flashcards, or settings to any server, ever.
 
 ## AI Processing
 
@@ -39,9 +61,14 @@ The AI tutor runs a language model entirely on your device using Google's LiteRT
 
 ## Third-Party Services
 
-RustSensei does not integrate with any third-party analytics, advertising, or data processing services.
+RustSensei does not integrate with any third-party analytics, advertising, or data-brokering services.
 
-The only external service accessed is [Hugging Face](https://huggingface.co) for the one-time model download.
+Two external services are contacted, both described above:
+
+| Service | Purpose | What it receives |
+|---|---|---|
+| [Hugging Face](https://huggingface.co) | One-time model download | Nothing beyond a standard file request |
+| [Rust Playground](https://play.rust-lang.org) (the Rust Project) | Compile and Run tests, only on your explicit action | The Rust code in the editor at that moment |
 
 ## Children's Privacy
 
@@ -53,8 +80,10 @@ If this privacy policy is updated, the changes will be reflected in this documen
 
 ## Contact
 
-If you have questions about this privacy policy, contact the developer:
+RustSensei is a product of **Syltech AI Systems, Inc.**, Kitchener, Ontario, Canada.
 
-**Sylvester Ranjith Francis**
-- GitHub: [github.com/sylvester-francis](https://github.com/sylvester-francis)
-- LinkedIn: [linkedin.com/in/sylvesterranjith](https://www.linkedin.com/in/sylvesterranjith/)
+If you have questions about this privacy policy:
+
+- Web: [syltechai.dev](https://syltechai.dev/)
+- Issues: [github.com/SyltechAI/RustSensei/issues](https://github.com/SyltechAI/RustSensei/issues)
+- LinkedIn: [Syltech AI Systems](https://www.linkedin.com/company/syltech-ai-systems-inc/)

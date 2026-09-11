@@ -6,7 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 
-class RagRetriever(private val context: Context) {
+class RagRetriever(private val context: Context) : ContextRetriever {
 
     private var chunks: List<RagChunk>? = null
     private var keywordIndex: Map<String, List<String>>? = null
@@ -60,7 +60,7 @@ class RagRetriever(private val context: Context) {
         }
     }
 
-    suspend fun retrieveContext(query: String, topK: Int = 3): String? = withContext(Dispatchers.IO) {
+    override suspend fun retrieveContext(query: String, topK: Int): String? = withContext(Dispatchers.IO) {
         try {
             ensureLoaded()
 

@@ -55,6 +55,7 @@ import com.sylvester.rustsensei.ui.theme.Spacing
 import com.sylvester.rustsensei.viewmodel.OutputSource
 import com.sylvester.rustsensei.viewmodel.PlaygroundViewModel
 import com.sylvester.rustsensei.ui.theme.AppColors
+import com.sylvester.rustsensei.ui.components.rememberNetworkComputeGate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -129,6 +130,14 @@ fun PlaygroundScreen(
 
             Spacer(modifier = Modifier.height(Spacing.LG))
 
+            // Compile leaves the device, so it goes through the consent gate.
+            val (requestCompile, compileConsentDialog) = rememberNetworkComputeGate(
+                hasAccepted = viewModel::hasAcceptedRemoteCompile,
+                onAccepted = viewModel::acceptRemoteCompile,
+                action = viewModel::compile
+            )
+            compileConsentDialog()
+
             // Run / Compile / Clear buttons row
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -189,7 +198,7 @@ fun PlaygroundScreen(
                 // Compile button
                 Button(
                     onClick = {
-                        if (uiState.isCompiling) viewModel.stopCompile() else viewModel.compile()
+                        if (uiState.isCompiling) viewModel.stopCompile() else requestCompile()
                     },
                     enabled = uiState.code.isNotBlank() && !uiState.isRunning,
                     modifier = Modifier

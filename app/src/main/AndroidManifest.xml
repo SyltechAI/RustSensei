@@ -45,7 +45,14 @@
         <service
             android:name=".llm.ModelForegroundService"
             android:foregroundServiceType="specialUse"
-            android:exported="false" />
+            android:exported="false">
+            <!-- Required for targetSdk 34+ when declaring the specialUse FGS type.
+                 The subtype is reviewed by Play; keep it in sync with what the
+                 service actually does (holds the on-device LLM resident in RAM). -->
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Keeps the on-device language model resident in memory so the offline Rust tutor can answer without a multi-second reload on every message. No network access, no data leaves the device." />
+        </service>
 
         <service
             android:name=".llm.ModelDownloadService"

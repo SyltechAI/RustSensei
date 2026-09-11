@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.sylvester.rustsensei.data.RemoteComputeConsent
 
 enum class ExerciseScreenMode {
     CATEGORIES,
@@ -60,8 +61,13 @@ class ExerciseViewModel @Inject constructor(
     private val contentRepo: ContentRepository,
     private val progressRepo: ProgressRepository,
     private val validateExercise: ValidateExerciseUseCase,
-    private val runExerciseTests: RunExerciseTestsUseCase
+    private val runExerciseTests: RunExerciseTestsUseCase,
+    private val remoteComputeConsent: RemoteComputeConsent
 ) : ViewModel() {
+
+    /** Run tests posts the editor contents to play.rust-lang.org; see the gate. */
+    fun hasAcceptedRemoteCompile(): Boolean = remoteComputeConsent.hasAcceptedRemoteCompile()
+    fun acceptRemoteCompile() = remoteComputeConsent.setAcceptedRemoteCompile(true)
 
     companion object {
         private const val TAG = "ExerciseViewModel"

@@ -189,7 +189,9 @@ abstract class AppDatabase : RoomDatabase() {
                     // WARNING: Do NOT use fallbackToDestructiveMigration() here — it wipes
                     // all user data (chat history, progress, stats) on ANY missing migration.
                     // Only allow destructive migration on version downgrade (e.g. debug builds).
-                    .fallbackToDestructiveMigrationOnDowngrade()
+                    // dropAllTables = true matches the behaviour of the deprecated no-arg
+                    // overload this replaces.
+                    .fallbackToDestructiveMigrationOnDowngrade(dropAllTables = true)
                     .build()
                 INSTANCE = instance
                 instance

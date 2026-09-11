@@ -13,6 +13,7 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.security.MessageDigest
 import java.util.concurrent.TimeUnit
+import kotlin.coroutines.cancellation.CancellationException
 
 sealed class DownloadState {
     data object Idle : DownloadState()
@@ -44,6 +45,24 @@ class ModelManager(private val context: Context) {
 
     companion object {
         private const val MODEL_DIR = "models"
+        private const val HTTP_RANGE_NOT_SATISFIABLE = 416
+
+        /** Slack on top of the advertised model size, as a percentage. */
+        private const val HEADROOM_PERCENT = 5
+
+        /**
+         * ENOSPC surfaces as a plain IOException whose message varies by device,
+         * so match on the message rather than on a type.
+         */
+        private fun isOutOfSpace(e: Throwable): Boolean {
+            var cause: Throwable? = e
+            while (cause != null) {
+                val msg = cause.message?.lowercase().orEmpty()
+                if ("enospc" in msg || "no space left" in msg) return true
+                cause = cause.cause
+            }
+            return false
+        }
 
         val AVAILABLE_MODELS = listOf(
             ModelInfo(
@@ -64,6 +83,25 @@ class ModelManager(private val context: Context) {
         )
 
         fun getModelById(id: String): ModelInfo? = AVAILABLE_MODELS.find { it.id == id }
+
+        /**
+         * Bytes still needed to finish a download of [expectedSizeBytes] given
+         * [alreadyDownloadedBytes] already on disk, plus [HEADROOM_PERCENT] slack
+         * so the model being slightly larger than advertised does not wedge the
+         * download at 99 percent.
+         */
+        fun requiredFreeBytes(expectedSizeBytes: Long, alreadyDownloadedBytes: Long): Long {
+            val remaining = (expectedSizeBytes - alreadyDownloadedBytes).coerceAtLeast(0L)
+            return remaining / 100 * HEADROOM_PERCENT + remaining
+        }
+
+        /**
+         * A negative [usableBytes] means the free space could not be read; treat
+         * that as "go ahead and try" rather than blocking the download on a
+         * failed stat call.
+         */
+        fun isInsufficientSpace(usableBytes: Long, requiredBytes: Long): Boolean =
+            usableBytes in 0 until requiredBytes
     }
 
     private val modelsDir: File
@@ -108,13 +146,50 @@ class ModelManager(private val context: Context) {
 
     fun deleteModel(): Boolean = deleteModel(AVAILABLE_MODELS[0])
 
-    /** Clean up any orphaned .tmp files from failed downloads. */
+    /**
+     * Deletes partial downloads that no longer belong to any available model.
+     *
+     * Models get retired (the 0.6B and 1.7B builds were), and their .tmp files
+     * are then unreachable: nothing can resume them and no UI offers to delete
+     * them, so up to ~1.2 GB stays stranded in app storage forever. Temp files
+     * for models that are still listed are kept — those are resumable.
+     */
     fun cleanupOrphanedTempFiles() {
-        modelsDir.listFiles()?.filter { it.name.endsWith(".tmp") }?.forEach { tmpFile ->
-            Log.i("ModelManager", "Cleaning up orphaned temp file: ${tmpFile.name} (${tmpFile.length() / (1024 * 1024)} MB)")
-            tmpFile.delete()
-        }
+        val resumable = AVAILABLE_MODELS.map { "${it.filename}.tmp" }.toSet()
+        modelsDir.listFiles()
+            ?.filter { it.name.endsWith(".tmp") && it.name !in resumable }
+            ?.forEach { tmpFile ->
+                Log.i(
+                    "ModelManager",
+                    "Removing stranded temp file: ${tmpFile.name} (${tmpFile.length() / (1024 * 1024)} MB)"
+                )
+                tmpFile.delete()
+            }
     }
+
+    /**
+     * Free bytes usable by this app in the data partition, or -1 if unknown.
+     * Uses usableSpace (quota-aware) rather than freeSpace.
+     */
+    fun usableSpaceBytes(): Long = try {
+        modelsDir.usableSpace
+    } catch (e: Exception) {
+        Log.w("ModelManager", "Could not read free space: ${e.message}")
+        -1L
+    }
+
+    /**
+     * Bytes still needed for [modelInfo], accounting for an existing partial
+     * download.
+     */
+    fun requiredFreeBytes(modelInfo: ModelInfo): Long {
+        val alreadyHave = getTempFile(modelInfo).let { if (it.exists()) it.length() else 0L }
+        return requiredFreeBytes(modelInfo.expectedSizeBytes, alreadyHave)
+    }
+
+    /** True when there is demonstrably not enough room to finish the download. */
+    fun hasInsufficientSpace(modelInfo: ModelInfo): Boolean =
+        isInsufficientSpace(usableSpaceBytes(), requiredFreeBytes(modelInfo))
 
     fun downloadModel(modelInfo: ModelInfo): Flow<DownloadState> = flow {
         emit(DownloadState.Downloading(0f, 0, 0))
@@ -132,24 +207,53 @@ class ModelManager(private val context: Context) {
             val tempFile = getTempFile(modelInfo)
             val finalFile = getModelFile(modelInfo)
 
+            // Fail fast on a full device. Without this the write dies ~900 MB in
+            // with a raw "No space left on device" and the user has no idea how
+            // much room to clear.
+            if (hasInsufficientSpace(modelInfo)) {
+                val neededMB = requiredFreeBytes(modelInfo) / (1024 * 1024)
+                val freeMB = usableSpaceBytes() / (1024 * 1024)
+                emit(DownloadState.Error(
+                    "Not enough storage. ${modelInfo.displayName} needs about $neededMB MB " +
+                        "free and this device has $freeMB MB. Free up some space and try again."
+                ))
+                return@flow
+            }
+
             var existingBytes = 0L
             if (tempFile.exists()) {
                 existingBytes = tempFile.length()
             }
 
-            val requestBuilder = Request.Builder().url(modelInfo.downloadUrl)
-            if (existingBytes > 0) {
-                requestBuilder.addHeader("Range", "bytes=$existingBytes-")
+            fun openResponse(rangeFrom: Long) = client.newCall(
+                Request.Builder().url(modelInfo.downloadUrl).apply {
+                    if (rangeFrom > 0) addHeader("Range", "bytes=$rangeFrom-")
+                }.build()
+            ).execute()
+
+            var response = openResponse(existingBytes)
+
+            // 416 means the partial file is at or past the end of the resource -
+            // typically a finished .tmp that never got renamed, or a file the
+            // server has since replaced. Retrying the same range forever leaves
+            // the download permanently stuck, so discard it and restart clean.
+            if (response.code == HTTP_RANGE_NOT_SATISFIABLE && existingBytes > 0) {
+                Log.w("ModelManager", "Server rejected resume range; restarting download from scratch")
+                response.close()
+                tempFile.delete()
+                existingBytes = 0
+                response = openResponse(0)
             }
 
-            val response = client.newCall(requestBuilder.build()).execute()
-
             if (!response.isSuccessful && response.code != 206) {
-                emit(DownloadState.Error("Download failed: HTTP ${response.code}"))
+                val code = response.code
+                response.close()
+                emit(DownloadState.Error("Download failed: HTTP $code"))
                 return@flow
             }
 
             val body = response.body ?: run {
+                response.close()
                 emit(DownloadState.Error("Empty response body"))
                 return@flow
             }
@@ -220,20 +324,59 @@ class ModelManager(private val context: Context) {
                 Log.i("ModelManager", "SHA256 verified: ${actualHash.take(16)}...")
             }
 
-            tempFile.renameTo(finalFile)
+            // A failed rename used to report success and leave the app looking for
+            // a model file that was never there. Fall back to a copy, and only then
+            // give up.
+            finalFile.delete()
+            if (!tempFile.renameTo(finalFile)) {
+                Log.w("ModelManager", "Rename failed, copying ${tempFile.name} into place")
+                val copied = try {
+                    tempFile.copyTo(finalFile, overwrite = true)
+                    tempFile.delete()
+                    true
+                } catch (e: Exception) {
+                    Log.e("ModelManager", "Copy fallback failed: ${e.message}", e)
+                    false
+                }
+                if (!copied || !finalFile.exists()) {
+                    emit(DownloadState.Error(
+                        "Downloaded the model but could not save it. Free up storage and try again."
+                    ))
+                    return@flow
+                }
+            }
             emit(DownloadState.Completed)
 
+        } catch (e: CancellationException) {
+            // User cancelled. Keep the partial file so the next attempt resumes,
+            // and let the cancellation propagate instead of reporting an error.
+            Log.i("ModelManager", "Download cancelled, keeping partial file for resume")
+            throw e
         } catch (e: Exception) {
             // Clean up partial download on non-resumable errors
             val tempFile = getTempFile(modelInfo)
-            if (e is java.net.UnknownHostException || e is java.net.ConnectException) {
-                // Network errors: keep temp file for resume
-                Log.w("ModelManager", "Network error, keeping temp file for resume: ${e.message}")
-            } else {
-                // Other errors: clean up to avoid orphaned files
-                tempFile.delete()
+            val message = when {
+                e is java.net.UnknownHostException || e is java.net.ConnectException -> {
+                    // Network errors: keep temp file for resume
+                    Log.w("ModelManager", "Network error, keeping temp file for resume: ${e.message}")
+                    "No internet connection. The download will resume where it left off."
+                }
+                e is java.net.SocketTimeoutException -> {
+                    Log.w("ModelManager", "Timeout, keeping temp file for resume")
+                    "The connection timed out. Tap Resume to continue where it left off."
+                }
+                isOutOfSpace(e) -> {
+                    // Keep the partial file: the user can free space and resume.
+                    Log.w("ModelManager", "Out of storage during download")
+                    "Ran out of storage while downloading. Free up space and tap Resume."
+                }
+                else -> {
+                    // Other errors: clean up to avoid orphaned files
+                    tempFile.delete()
+                    e.message ?: "Unknown download error"
+                }
             }
-            emit(DownloadState.Error(e.message ?: "Unknown download error"))
+            emit(DownloadState.Error(message))
         }
     }.flowOn(Dispatchers.IO)
 

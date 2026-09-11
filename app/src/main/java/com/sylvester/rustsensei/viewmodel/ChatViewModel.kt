@@ -19,6 +19,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicBoolean
@@ -206,6 +207,16 @@ class ChatViewModel @Inject constructor(
             }
 
             sendChatMessage(convId, message, context, _config.value, chatMode = _chatMode.value)
+                .catch { t ->
+                    // Last line of defence: an exception escaping the use case would
+                    // otherwise be uncaught in viewModelScope and take the app down.
+                    Log.e(TAG, "Chat stream failed: ${t.message}", t)
+                    _uiState.value = _uiState.value.copy(
+                        isGenerating = false,
+                        streamingText = "",
+                        errorMessage = t.message ?: "Something went wrong. Please try again."
+                    )
+                }
                 .onCompletion {
                     sendingGate.set(false)
                     modelLifecycle.scheduleIdleUnload()

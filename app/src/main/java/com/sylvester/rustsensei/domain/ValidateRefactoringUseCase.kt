@@ -7,6 +7,7 @@ import com.sylvester.rustsensei.llm.ModelLifecycle
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
+import kotlin.coroutines.cancellation.CancellationException
 
 sealed interface RefactoringEvent {
     data class Token(val displayText: String) : RefactoringEvent
@@ -44,6 +45,8 @@ open class ValidateRefactoringUseCase @Inject constructor(
                     ChatTemplateFormatter.stripThinkTags(buffer.toString())
                 ))
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             emit(RefactoringEvent.Error(e.message ?: "Validation failed"))
             return@flow
