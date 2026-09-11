@@ -8,6 +8,7 @@ import com.sylvester.rustsensei.network.PlaygroundResponse
 import com.sylvester.rustsensei.testdoubles.FakeInferenceEngine
 import com.sylvester.rustsensei.testdoubles.FakeModelLifecycle
 import com.sylvester.rustsensei.testdoubles.FakePlaygroundService
+import com.sylvester.rustsensei.testdoubles.FakeRemoteComputeConsent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -46,7 +47,13 @@ class PlaygroundViewModelTest {
 
         val simulateUseCase = SimulateExecutionUseCase(fakeEngine, fakeLifecycle)
         val compileUseCase = CompileCodeUseCase(fakePlaygroundService)
-        viewModel = PlaygroundViewModel(simulateUseCase, compileUseCase, fakeConfigProvider, fakeLifecycle)
+        viewModel = PlaygroundViewModel(
+            simulateUseCase,
+            compileUseCase,
+            fakeConfigProvider,
+            fakeLifecycle,
+            FakeRemoteComputeConsent()
+        )
     }
 
     @After

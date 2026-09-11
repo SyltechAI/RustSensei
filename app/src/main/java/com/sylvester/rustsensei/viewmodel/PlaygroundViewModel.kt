@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.sylvester.rustsensei.data.RemoteComputeConsent
 
 enum class OutputSource { NONE, AI_SIMULATION, COMPILATION }
 
@@ -41,8 +42,13 @@ class PlaygroundViewModel @Inject constructor(
     private val simulateExecution: SimulateExecutionUseCase,
     private val compileCode: CompileCodeUseCase,
     private val configProvider: InferenceConfigProvider,
-    private val modelLifecycle: ModelLifecycle
+    private val modelLifecycle: ModelLifecycle,
+    private val remoteComputeConsent: RemoteComputeConsent
 ) : ViewModel() {
+
+    /** Compile posts the editor contents to play.rust-lang.org; see the gate. */
+    fun hasAcceptedRemoteCompile(): Boolean = remoteComputeConsent.hasAcceptedRemoteCompile()
+    fun acceptRemoteCompile() = remoteComputeConsent.setAcceptedRemoteCompile(true)
 
     val modelState: StateFlow<ModelReadyState> = modelLifecycle.state
 

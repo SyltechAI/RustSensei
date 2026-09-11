@@ -3,6 +3,7 @@ package com.sylvester.rustsensei.di
 import android.content.Context
 import com.sylvester.rustsensei.content.ContentProvider
 import com.sylvester.rustsensei.content.ContentRepository
+import com.sylvester.rustsensei.content.ContextRetriever
 import com.sylvester.rustsensei.content.RagRetriever
 import com.sylvester.rustsensei.data.AppDatabase
 import com.sylvester.rustsensei.data.ChatDao
@@ -10,6 +11,7 @@ import com.sylvester.rustsensei.data.ChatRepository
 import com.sylvester.rustsensei.data.FlashCardDao
 import com.sylvester.rustsensei.data.InferenceConfigProvider
 import com.sylvester.rustsensei.data.PreferencesManager
+import com.sylvester.rustsensei.data.RemoteComputeConsent
 import com.sylvester.rustsensei.data.ProgressDao
 import com.sylvester.rustsensei.data.ProgressRepository
 import dagger.Binds
@@ -66,12 +68,21 @@ abstract class DataModule {
 
         @Provides
         @Singleton
+        fun provideContextRetriever(ragRetriever: RagRetriever): ContextRetriever = ragRetriever
+
+        @Provides
+        @Singleton
         fun providePreferencesManager(@ApplicationContext context: Context): PreferencesManager =
             PreferencesManager(context)
 
         @Provides
         @Singleton
         fun provideInferenceConfigProvider(preferencesManager: PreferencesManager): InferenceConfigProvider =
+            preferencesManager
+
+        @Provides
+        @Singleton
+        fun provideRemoteComputeConsent(preferencesManager: PreferencesManager): RemoteComputeConsent =
             preferencesManager
     }
 }

@@ -7,7 +7,8 @@ import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKeys
 import com.sylvester.rustsensei.llm.InferenceConfig
 
-open class PreferencesManager(private val context: Context) : InferenceConfigProvider {
+open class PreferencesManager(private val context: Context) :
+    InferenceConfigProvider, RemoteComputeConsent {
 
     private val prefs: SharedPreferences by lazy {
         try {
@@ -89,4 +90,22 @@ open class PreferencesManager(private val context: Context) : InferenceConfigPro
     // Study Reminders
     fun areRemindersEnabled(): Boolean = prefs.getBoolean("reminders_enabled", false)
     fun setRemindersEnabled(enabled: Boolean) = prefs.edit().putBoolean("reminders_enabled", enabled).apply()
+
+    // Reminder throttling. The reminder worker runs every 4 hours; without a
+    // per-day stamp per reminder kind it would alert up to six times a day for
+    // the same due flashcards.
+    // Compile / Run tests post the user's source to play.rust-lang.org. The app
+    // is otherwise fully local, so that crossing is gated on a remembered opt-in.
+    override fun hasAcceptedRemoteCompile(): Boolean =
+        prefs.getBoolean("accepted_remote_compile", false)
+
+    override fun setAcceptedRemoteCompile(accepted: Boolean) {
+        prefs.edit().putBoolean("accepted_remote_compile", accepted).apply()
+    }
+
+    fun getLastReminderDate(kind: String): String =
+        prefs.getString("last_reminder_$kind", "") ?: ""
+
+    fun setLastReminderDate(kind: String, date: String) =
+        prefs.edit().putString("last_reminder_$kind", date).apply()
 }

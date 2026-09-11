@@ -67,12 +67,16 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import com.sylvester.rustsensei.ui.components.SpecLabel
+import com.sylvester.rustsensei.ui.util.openPlayStoreSafely
+import com.sylvester.rustsensei.ui.util.openUrlSafely
+import com.sylvester.rustsensei.ui.util.shareTextSafely
 import com.sylvester.rustsensei.ui.util.toggleFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
+import com.sylvester.rustsensei.BuildConfig
 import com.sylvester.rustsensei.MainActivity
 import com.sylvester.rustsensei.R
 import androidx.compose.ui.unit.dp
@@ -739,9 +743,7 @@ fun SettingsScreen(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable {
-                                    aboutContext.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-                                }
+                                .clickable { aboutContext.openUrlSafely(url) }
                                 .padding(vertical = Spacing.SM),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -797,10 +799,7 @@ fun SettingsScreen(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable {
-                                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(link.url))
-                                    aboutContext.startActivity(intent)
-                                }
+                                .clickable { aboutContext.openUrlSafely(link.url) }
                                 .padding(vertical = Spacing.SM),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -853,8 +852,7 @@ fun SettingsScreen(
                         fontFamily = FontFamily.Monospace,
                         color = AppColors.current.cyan,
                         modifier = Modifier.clickable {
-                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/rust-lang/book"))
-                            aboutContext.startActivity(intent)
+                            aboutContext.openUrlSafely("https://github.com/rust-lang/book")
                         }
                     )
                     Spacer(modifier = Modifier.height(Spacing.MD))
@@ -871,8 +869,7 @@ fun SettingsScreen(
                         fontFamily = FontFamily.Monospace,
                         color = AppColors.current.cyan,
                         modifier = Modifier.clickable {
-                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/rust-lang/rustlings"))
-                            aboutContext.startActivity(intent)
+                            aboutContext.openUrlSafely("https://github.com/rust-lang/rustlings")
                         }
                     )
                     Spacer(modifier = Modifier.height(Spacing.MD))
@@ -950,7 +947,7 @@ private fun TipsCard() {
         listOf(
             "Switch teaching styles in Chat: Direct, Socratic, or Rubber Duck.",
             "Stuck on an exercise or a Playground error? Tap Ask Sensei to pull your code straight into Chat.",
-            "Everything runs offline and private, entirely on your device.",
+            "Learning, chat, and progress run entirely on your device. Only Compile and Run tests reach out, to play.rust-lang.org.",
             "Watch ownership and borrowing move step by step in the Visualizer.",
             "Run real Rust in the Playground and compile it on demand.",
             "Your dashboard suggests a next best action based on what you have done so far."
@@ -997,35 +994,20 @@ private fun SupportSection() {
     ) {
         Column {
             SupportRow(Icons.Default.Favorite, "Star on GitHub") {
-                ctx.startActivity(
-                    Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/SyltechAI/RustSensei"))
-                )
+                ctx.openUrlSafely("https://github.com/SyltechAI/RustSensei")
             }
             SupportRow(Icons.Default.BugReport, "Report a bug") {
-                ctx.startActivity(
-                    Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/SyltechAI/RustSensei/issues"))
-                )
+                ctx.openUrlSafely("https://github.com/SyltechAI/RustSensei/issues")
             }
             SupportRow(Icons.Default.Star, "Rate RustSensei") {
-                val appId = "com.sylvester.rustsensei"
-                try {
-                    ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$appId")))
-                } catch (_: Exception) {
-                    ctx.startActivity(
-                        Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=$appId"))
-                    )
-                }
+                ctx.openPlayStoreSafely(BuildConfig.APPLICATION_ID)
             }
             SupportRow(Icons.Default.Share, "Share RustSensei") {
-                val send = Intent(Intent.ACTION_SEND).apply {
-                    type = "text/plain"
-                    putExtra(
-                        Intent.EXTRA_TEXT,
-                        "RustSensei: learn Rust with an offline, on-device AI tutor. " +
-                            "https://play.google.com/store/apps/details?id=com.sylvester.rustsensei"
-                    )
-                }
-                ctx.startActivity(Intent.createChooser(send, "Share RustSensei"))
+                ctx.shareTextSafely(
+                    "RustSensei: learn Rust with an offline, on-device AI tutor. " +
+                        "https://play.google.com/store/apps/details?id=${BuildConfig.APPLICATION_ID}",
+                    "Share RustSensei"
+                )
             }
         }
     }

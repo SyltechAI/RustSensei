@@ -37,25 +37,42 @@ class OkHttpPlaygroundService @Inject constructor() : RustPlaygroundService {
                 .post(jsonBody.toString().toRequestBody(JSON_MEDIA_TYPE))
                 .build()
 
-            val response = client.newCall(httpRequest).execute()
-
-            if (!response.isSuccessful) {
-                throw PlaygroundApiException("Playground API error: HTTP ${response.code}")
+            // use{} matters here: returning or throwing without closing the
+            // response leaks the connection out of OkHttp's pool.
+            val body = client.newCall(httpRequest).execute().use { response ->
+                if (!response.isSuccessful) {
+                    throw PlaygroundApiException("Playground API error: HTTP ${response.code}")
+                }
+                response.body?.string()
+                    ?: throw PlaygroundApiException("Empty response from Playground API")
             }
 
-            val body = response.body?.string()
-                ?: throw PlaygroundApiException("Empty response from Playground API")
-
-            val json = JSONObject(body)
-            PlaygroundResponse(
-                success = json.getBoolean("success"),
-                stdout = json.optString("stdout", ""),
-                stderr = json.optString("stderr", "")
-            )
+            parseResponse(body)
         }
 
     companion object {
         private const val PLAYGROUND_URL = "https://play.rust-lang.org/execute"
         private val JSON_MEDIA_TYPE = "application/json".toMediaType()
+
+        /**
+         * Maps a Playground reply body onto [PlaygroundResponse].
+         *
+         * Deliberately tolerant: the service can answer with an HTML error page
+         * behind a captive portal, or a JSON error envelope during an outage.
+         * getBoolean("success") turned both of those into a bare
+         * "No value for success" surfaced to the user as the compile result.
+         */
+        fun parseResponse(body: String): PlaygroundResponse {
+            val json = try {
+                JSONObject(body)
+            } catch (e: Exception) {
+                throw PlaygroundApiException("Unexpected response from the Rust Playground", e)
+            }
+            return PlaygroundResponse(
+                success = json.optBoolean("success", false),
+                stdout = json.optString("stdout", ""),
+                stderr = json.optString("stderr", "").ifEmpty { json.optString("error", "") }
+            )
+        }
     }
 }
