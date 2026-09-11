@@ -21,14 +21,14 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace = "com.sylvester.rustsensei"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.sylvester.rustsensei"
         minSdk = 26
-        targetSdk = 35
-        versionCode = 35
-        versionName = "1.4.5"
+        targetSdk = 36
+        versionCode = 36
+        versionName = "1.4.6"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
