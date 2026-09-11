@@ -49,14 +49,14 @@ The one deliberate exception: **Compile** and **Run tests** post the code in you
 - **Context-Aware Help** — ask about a book section or get help with an exercise, and the AI has full context
 - **Socratic & Rubber Duck Modes** — AI asks guiding questions or lets you explain concepts back, with 3 switchable chat modes
 - **Rust Playground** — write Rust code and see simulated output via on-device AI execution tracing
-- **Explain This Error** — paste any compiler error and get a clear AI explanation enriched with 44 bundled error references
-- **19-Chapter Rust Book** — from Getting Started to Macros, with code examples and reading progress tracking
+- **Explain This Error** — paste any compiler error and get a clear AI explanation enriched with 49 bundled error references
+- **21-Chapter Rust Book** — from Getting Started to the appendix, with code examples and reading progress tracking
 - **97 Coding Exercises** — Rustlings-style challenges with syntax-highlighted editor, hints, and AI-powered code review
 - **Code Refactoring Challenges** — transform ugly-but-working Rust code into idiomatic style, scored by AI (0-100)
 - **Daily Challenges** — a new deterministic exercise every day with completion tracking and streak integration
 - **3 Guided Projects** — multi-step builds (CLI Todo, Word Counter, JSON Parser) tying chapters together
-- **5 Topic Quizzes** (32 questions) — multiple choice, true/false, and code completion with score rings and detailed feedback
-- **110+ Spaced Repetition Flashcards** — SM2-scheduled review system for long-term retention
+- **50 Quizzes** (312 questions) — multiple choice, true/false, and code completion with score rings and detailed feedback
+- **Spaced Repetition Flashcards** — generated from the book's key terms, SM2-scheduled for long-term retention
 - **5 Guided Learning Paths** — structured step-by-step progression through Rust concepts
 - **Ownership Visualizer** — interactive step-by-step memory diagrams for moves, borrows, clones, drops, and Rc
 - **Offline Rust Docs** — bundled searchable stdlib reference for 25 core types (String, Vec, Option, Result, HashMap, Iterator, Path, File, Future, Channel, and more)
@@ -68,7 +68,7 @@ The one deliberate exception: **Compile** and **Run tests** post the code in you
 - **Achievement Badges** — unlock milestones for reading, coding, quizzes, and streaks
 - **Activity Heatmap** — GitHub-style weekly visualization of your learning activity
 - **Conversation History** — persisted locally, accessible from a navigation drawer
-- **Exercise Search & Filter** — search 200+ exercises by name, filter by difficulty (Beginner/Intermediate/Advanced)
+- **Exercise Search & Filter** — search all 97 exercises by name, filter by difficulty (Beginner/Intermediate/Advanced)
 - **Confetti Celebrations** — particle burst on exercise completion, daily goal, review session, quiz high score
 - **3D Flashcard Flip** — smooth rotation animation when revealing card answers
 - **Haptic Feedback** — tactile response on send, answer selection, and flashcard rating
