@@ -37,6 +37,9 @@ class LiteRtEngine(private val context: Context) : InferenceEngine {
     companion object {
         private const val TAG = "LiteRtEngine"
 
+        /** Below this a .litertlm file is a stub or a truncated download. */
+        private const val MIN_MODEL_BYTES = 1_000_000L
+
         // Bug 5: single source of truth for sampler parameters, used in both
         // loadModel() and clearCache() to prevent configuration drift.
         val DEFAULT_SAMPLER = SamplerConfig(
@@ -81,6 +84,16 @@ class LiteRtEngine(private val context: Context) : InferenceEngine {
         lastModelPath = modelPath
         lastContextSize = contextSize
         return withContext(Dispatchers.IO) {
+            // Native LiteRT aborts the process on a missing or truncated model
+            // rather than throwing, so the path has to be checked on this side.
+            val file = java.io.File(modelPath)
+            if (!file.exists() || file.length() < MIN_MODEL_BYTES) {
+                Log.e(TAG, "Model file missing or truncated: $modelPath (${file.length()} bytes)")
+                _modelLoaded.value = false
+                _isModelLoading.value = false
+                return@withContext false
+            }
+
             synchronized(lock) {
                 try {
                     _isModelLoading.value = true

@@ -73,6 +73,7 @@ import com.sylvester.rustsensei.R
 import com.sylvester.rustsensei.data.Conversation
 import com.sylvester.rustsensei.llm.ChatMode
 import com.sylvester.rustsensei.llm.ModelReadyState
+import com.sylvester.rustsensei.ui.util.shareTextSafely
 import com.sylvester.rustsensei.ui.theme.Alpha
 import com.sylvester.rustsensei.ui.theme.Dimens
 import com.sylvester.rustsensei.ui.theme.SecondaryText
@@ -195,14 +196,10 @@ fun ChatScreen(
                 )
                 if (uiState.messages.isNotEmpty()) {
                     IconButton(onClick = {
-                        val shareText = viewModel.exportConversation()
-                        val sendIntent = Intent().apply {
-                            action = Intent.ACTION_SEND
-                            putExtra(Intent.EXTRA_TEXT, shareText)
-                            type = "text/plain"
-                        }
-                        val shareIntent = Intent.createChooser(sendIntent, "Share conversation")
-                        context.startActivity(shareIntent)
+                        context.shareTextSafely(
+                            viewModel.exportConversation(),
+                            "Share conversation"
+                        )
                     }) {
                         Icon(
                             Icons.Default.Share,

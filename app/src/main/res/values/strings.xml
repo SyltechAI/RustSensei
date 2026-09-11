@@ -26,6 +26,9 @@
     <string name="notification_downloading">Downloading Rust mentor model</string>
     <string name="notification_downloading_progress">%1$d / %2$d MB</string>
     <string name="storage_warning">This will use approximately 2.5 GB of storage.</string>
+    <string name="download_cancel">Cancel</string>
+    <string name="no_browser_available">No app on this device can open links.</string>
+    <string name="no_share_target_available">No app on this device can share text.</string>
 
     <!-- Dashboard -->
     <string name="welcome_title">Welcome to Rust!</string>
@@ -188,6 +191,14 @@
     <string name="playground_no_internet">Internet required to compile</string>
     <string name="playground_clear">Clear</string>
     <string name="playground_card_subtitle">Run Rust code</string>
+    <string name="playground_network_notice">Compile sends your code to play.rust-lang.org</string>
+
+    <!-- Remote compilation consent -->
+    <string name="remote_compile_consent_title">Send code to Rust Playground?</string>
+    <string name="remote_compile_consent_body">Compiling and running tests uses the official Rust Playground at play.rust-lang.org. The Rust code in the editor is sent to that service over HTTPS so real rustc can build it, and the output is sent back.</string>
+    <string name="remote_compile_consent_scope">Nothing else leaves your device. Chat, the book, exercises, quizzes, and all your progress stay on-device. You can decline and keep using the simulated runner instead.</string>
+    <string name="remote_compile_consent_accept">Send and compile</string>
+    <string name="remote_compile_consent_cancel">Not now</string>
 
     <!-- Exercise Tests -->
     <string name="exercise_run_tests">Run Tests</string>
