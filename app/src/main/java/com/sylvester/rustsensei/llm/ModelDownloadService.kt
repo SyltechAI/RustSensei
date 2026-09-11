@@ -110,6 +110,30 @@ class ModelDownloadService : Service() {
         return START_NOT_STICKY
     }
 
+    /**
+     * Android 15+ caps a dataSync foreground service at six hours in any 24 hour
+     * window. When the budget runs out the system calls this and expects the
+     * service to stop almost immediately; not stopping raises
+     * ForegroundServiceDidNotStopInTimeException and kills the app.
+     *
+     * A 1.2 GB model on a slow or repeatedly interrupted connection can reach
+     * that budget, so treat it as a pause: drop the download, keep the partial
+     * file, and tell the user they can resume.
+     */
+    override fun onTimeout(startId: Int, fgsType: Int) {
+        Log.w(TAG, "dataSync foreground budget exhausted; pausing download")
+        downloadJob?.cancel()
+        downloadJob = null
+        downloadState.update(
+            DownloadState.Error(
+                "The download was paused by Android after running for a long time. " +
+                    "Tap Resume to continue where it left off."
+            )
+        )
+        ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
+        stopSelf()
+    }
+
     override fun onDestroy() {
         scope.cancel()
         super.onDestroy()

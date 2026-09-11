@@ -39,7 +39,11 @@ class ModelForegroundService : Service() {
                 this,
                 NOTIFICATION_ID,
                 buildNotification(),
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                // specialUse only exists from API 34. On 29..33 the platform
+                // checks the passed type against the manifest-declared types and
+                // rejects this constant, which would drop the service out of the
+                // foreground on a large slice of the install base.
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                     ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
                 } else {
                     0

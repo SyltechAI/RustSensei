@@ -36,7 +36,7 @@
     <string name="onboarding_step1_title">Read the Book</string>
     <string name="onboarding_step1_desc">Start with Chapter 1 — we\'ll explain Rust like you\'re coming from Python</string>
     <string name="onboarding_step2_title">Practice Exercises</string>
-    <string name="onboarding_step2_desc">213 exercises from Rustlings — with hints and AI code review</string>
+    <string name="onboarding_step2_desc">97 exercises from Rustlings — with hints and AI code review</string>
     <string name="onboarding_step3_title">Test Yourself</string>
     <string name="onboarding_step3_desc">Take quizzes and review flashcards to lock in what you learn</string>
     <string name="start_chapter_1">Start Chapter 1</string>

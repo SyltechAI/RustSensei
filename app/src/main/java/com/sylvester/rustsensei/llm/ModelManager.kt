@@ -1,6 +1,7 @@
 package com.sylvester.rustsensei.llm
 
 import android.content.Context
+import android.os.storage.StorageManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -168,14 +169,28 @@ class ModelManager(private val context: Context) {
     }
 
     /**
-     * Free bytes usable by this app in the data partition, or -1 if unknown.
-     * Uses usableSpace (quota-aware) rather than freeSpace.
+     * Bytes this app could actually obtain in the data partition, or -1 if the
+     * figure cannot be read.
+     *
+     * Prefers StorageManager.getAllocatableBytes, which counts space the system
+     * would reclaim from other apps' caches. File.usableSpace ignores that and
+     * can report a few hundred MB free on a device holding gigabytes of
+     * clearable cache, which would wrongly block the download.
      */
     fun usableSpaceBytes(): Long = try {
-        modelsDir.usableSpace
+        val storageManager = context.getSystemService(StorageManager::class.java)
+        val uuid = storageManager?.getUuidForPath(modelsDir)
+        val allocatable = uuid?.let { storageManager.getAllocatableBytes(it) } ?: 0L
+        maxOf(allocatable, modelsDir.usableSpace)
     } catch (e: Exception) {
-        Log.w("ModelManager", "Could not read free space: ${e.message}")
-        -1L
+        // getUuidForPath throws on some OEM builds for non-standard paths.
+        Log.w("ModelManager", "Falling back to usableSpace: ${e.message}")
+        try {
+            modelsDir.usableSpace
+        } catch (e2: Exception) {
+            Log.w("ModelManager", "Could not read free space: ${e2.message}")
+            -1L
+        }
     }
 
     /**
