@@ -30,6 +30,12 @@ FONT_PATH = os.path.join(REPO, "app/src/main/res/font/archivo.ttf")
 # ── The launcher mark, in its native 108dp viewport ───────────────────
 # Mirrors ic_launcher_foreground.xml exactly. Change it there, re-run this.
 VIEWPORT = 108.0
+# Launchers mask an adaptive icon down to roughly the inner 72dp. The store
+# icon carries no mask, so rendering the full 108 makes the identical mark look
+# 1.5x smaller than it does on the home screen. Play rejected exactly this kind
+# of listing/launcher mismatch, so the store icon is scaled by 108/72 to match
+# the apparent size a user sees.
+SAFE_ZONE = 72.0
 CHEVRON = [(36.0, 32.0), (66.0, 54.0), (36.0, 76.0)]
 CHEVRON_STROKE = 12.0
 NODE_CENTER = (72.0, 34.0)
@@ -96,8 +102,10 @@ def generate_icon(out_dir):
     s = size * SUPERSAMPLE
     img = Image.new("RGB", (s, s), INK)
     draw = ImageDraw.Draw(img)
-    # Full-bleed: the mark keeps its launcher proportions against the tile.
-    draw_mark(draw, s / 2.0, s / 2.0, s)
+    # Scale so the adaptive icon's safe zone, not its full canvas, fills the
+    # tile. This is what makes the store icon and the launcher icon read as the
+    # same icon rather than two sizes of the same mark.
+    draw_mark(draw, s / 2.0, s / 2.0, s * (VIEWPORT / SAFE_ZONE))
     img = img.resize((size, size), Image.LANCZOS)
     path = os.path.join(out_dir, "app_icon_512x512.png")
     img.save(path, "PNG")
